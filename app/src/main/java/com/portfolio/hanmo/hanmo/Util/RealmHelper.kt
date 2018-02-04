@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
+import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.R
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -51,16 +52,28 @@ class RealmHelper private constructor() {
         editor.commit()
 
         val count = queryFirst(Active_Count_Table::class.java)
-        when(count){
+        val tect_list = queryFirst(TechStack_Table::class.java)
+
+        when(count) {
             null -> {
                 var count_table = Active_Count_Table()
                 count_table.id = 1
                 count_table.count = 1
                 addData(count_table)
             }
-            else -> { Log.d(CREATE_REALM, "active count table init fail") }
         }
+        when(tect_list) {
+            null -> {
+                var tech = TechStack_Table()
+                val name = arrayOf("tech 01", "tech 02", "tech 03", "tech 04", "tech 05", "tech 06")
 
+                for (i in 0..5) {
+                    tech.id = i
+                    tech.tech_name = name[i]
+                    addData(tech)
+                }
+            }
+        }
     }
 
     fun updateActiveCount() {

@@ -26,6 +26,8 @@ dependencies {
 
     ext.anko_version='0.10.3'
 
+    final SUPPORT_LIBRARY_VERSION = '26.1.0'
+
     compile 'com.ifttt:sparklemotion:1.0.1'
 
     // Anko Commons
@@ -38,6 +40,8 @@ dependencies {
     // Coroutine listeners for Anko Layouts
     compile "org.jetbrains.anko:anko-sdk25-coroutines:$anko_version"
     compile "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
+
+    compile "com.android.support:recyclerview-v7:$SUPPORT_LIBRARY_VERSION"
 
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
