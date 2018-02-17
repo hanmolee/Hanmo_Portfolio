@@ -1,14 +1,11 @@
 package com.portfolio.hanmo.hanmo.Fragment
 
-import android.app.Fragment
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
@@ -16,16 +13,18 @@ import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.MainActivity
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.fragment_firstview.view.*
 import kotlinx.android.synthetic.main.fragment_pager.view.*
 import kotlinx.android.synthetic.main.fragment_stackpage.view.*
+import org.jetbrains.anko.toast
 
 /**
  * Created by hanmo on 2018. 2. 3..
  */
-class Fragment_Pager : Fragment() {
+class Fragment_Pager : BaseFragment() {
 
     private var sparkleViewPagerLayout: SparkleViewPagerLayout? = null
     private var sparkleMotion: SparkleMotion? = null
@@ -36,26 +35,27 @@ class Fragment_Pager : Fragment() {
         sparkleViewPagerLayout = rootView.pager_layout
         sparkleMotion = SparkleMotion.with(sparkleViewPagerLayout!!)
 
-        sparkleViewPagerLayout!!.viewPager.adapter = SparklePageAdapter()
-        sparkleViewPagerLayout!!.viewPager.setCurrentItem(1, true)
-        sparkleViewPagerLayout!!.viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        with(sparkleViewPagerLayout!!){
+            viewPager.adapter = SparklePageAdapter(this@Fragment_Pager)
+            viewPager.setCurrentItem(1, true)
+            viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
 
-            }
-
-            override fun onPageSelected(position: Int) {
-                when(position) {
-                    0 -> { onBackButtonPressed(rootView) }
-                    2 -> { onBackButtonPressed(rootView) }
                 }
 
-            }
+                override fun onPageSelected(position: Int) {
+                    when(position) {
+                        0 -> { onBackButtonPressed(rootView) }
+                        2 -> { onBackButtonPressed(rootView) }
+                    }
 
-            override fun onPageScrollStateChanged(state: Int) {
+                }
 
-            }
-        })
+                override fun onPageScrollStateChanged(state: Int) {
 
+                }
+            })
+        }
 
         return rootView
     }
@@ -71,7 +71,9 @@ class Fragment_Pager : Fragment() {
         })
     }
 
-    private class SparklePageAdapter : ViewPagerAdapter() {
+    private class SparklePageAdapter(thisContext: Fragment_Pager) : ViewPagerAdapter() {
+
+        var _thisContext = thisContext
 
         var type : Int = 0
 
@@ -93,13 +95,56 @@ class Fragment_Pager : Fragment() {
         private fun stackViewPage(container: ViewGroup): View? {
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_stackpage, container, false)
 
+            val gestureDetector = GestureDetector(container.context, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
+                    return true
+                }
+            })
+
             with(rootView.technical_stacklist) {
                 val tech_list = ArrayList<TechStack>()
                 getData(tech_list)
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
                 adapter = TechListAdapter(tech_list, type)
+                addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+                    override fun onTouchEvent(rv: RecyclerView?, e: MotionEvent?) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
 
+                    override fun onInterceptTouchEvent(rv: RecyclerView?, e: MotionEvent?): Boolean {
+                        val child = rootView.technical_stacklist.findChildViewUnder(e!!.x, e!!.y)
+                        when {
+                            child != null && gestureDetector.onTouchEvent(e) -> {
+                                val tech_id = tech_list[rootView.technical_stacklist.getChildAdapterPosition(child)].id
+                                var tech_name = tech_list[rootView.technical_stacklist.getChildAdapterPosition(child)].name
+                                when(tech_id){
+                                    0 -> {
+                                        var stack01 = PushFragment()
+                                        _thisContext.replaceFramgment(R.id.content_frame, stack01)
+                                    }
+                                    1 -> {
+                                        container.context.toast(tech_name)
+                                    }
+                                    2 -> {
+                                        container.context.toast(tech_name)
+                                    }
+                                    3-> {
+                                        container.context.toast(tech_name)
+                                    }
+
+                                }
+                            }
+                        }
+
+                        return false
+                    }
+
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                })
             }
 
             return rootView
@@ -114,7 +159,7 @@ class Fragment_Pager : Fragment() {
                 }
                 else -> {
                     type = 6
-                    result.forEach { tech_list.add(TechStack(it.tech_name!!)) }
+                    result.forEach { tech_list.add(TechStack(it.id, it.tech_name!!)) }
                 }
             }
         }
@@ -136,8 +181,6 @@ class Fragment_Pager : Fragment() {
 
             return rootView
         }
-
-
 
     }
 

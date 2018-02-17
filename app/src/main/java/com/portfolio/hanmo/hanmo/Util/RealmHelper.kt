@@ -65,7 +65,7 @@ class RealmHelper private constructor() {
         when(tect_list) {
             null -> {
                 var tech = TechStack_Table()
-                val name = arrayOf("tech 01", "tech 02", "tech 03", "tech 04", "tech 05", "tech 06")
+                val name = arrayOf("FCM PUSH", "AppWidget", "Encryption", "tech 04", "tech 05", "tech 06")
 
                 for (i in 0..5) {
                     tech.id = i

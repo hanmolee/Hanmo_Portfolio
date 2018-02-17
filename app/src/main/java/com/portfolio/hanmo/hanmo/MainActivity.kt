@@ -3,17 +3,19 @@ package com.portfolio.hanmo.hanmo
 import android.app.Activity
 import android.os.Bundle
 import android.support.annotation.IdRes
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.widget.Toast
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
-import com.portfolio.hanmo.hanmo.Fragment.FirstViewFragment
 import com.portfolio.hanmo.hanmo.Fragment.Fragment_Pager
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 
 /**
  * Created by hanmo on 2018. 2. 3..
  */
-class MainActivity : Activity() {
+class MainActivity : FragmentActivity() {
 
+    var backStackPosition = 0
     var count = 0
     private var isFirstBackClicked = true
 
@@ -32,6 +34,10 @@ class MainActivity : Activity() {
         val fragment_Pager = Fragment_Pager()
         replaceContentFragment(R.id.content_frame, fragment_Pager)
 
+    }
+
+    fun replaceFragment(fragment: android.app.Fragment) {
+        replaceContentFragment(R.id.content_frame, fragment)
     }
 
     fun Activity.replaceContentFragment(@IdRes frameId: Int, fragment: android.app.Fragment){
