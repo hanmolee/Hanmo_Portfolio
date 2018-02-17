@@ -3,13 +3,17 @@ package com.portfolio.hanmo.hanmo.Util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.portfolio.hanmo.hanmo.Activity.AdminActivity
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
+import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmObject
 import io.realm.RealmResults
+import org.jetbrains.anko.toast
 
 /**
  * Created by hanmo on 2018. 2. 3..
@@ -85,6 +89,50 @@ class RealmHelper private constructor() {
         realm!!.commitTransaction()
 
     }
+
+    fun adminLogin(context: AdminActivity, id: String, pwd: String) {
+        val toEdit = realm!!.where(Admin_Table::class.java).equalTo("admin_id", id).findFirst()
+        when(toEdit) {
+            null -> {
+                //아이디가 존재하지 않습니다
+                context.toast("아이디가 존재하지 않습니다.")
+            }
+            else -> {
+                when {
+                    toEdit!!.admin_password.equals(pwd) -> {
+                        //로그인 가능
+                        admin = 1
+                        context.setResult(100)
+                        context.finish()
+                    }
+                    else -> {
+                        //비밀번호가 틀렸습니다
+                        context.toast("비밀번호가 틀렸습니다")
+                    }
+                }
+            }
+        }
+    }
+
+    fun adminCreate(id: String, pwd: String) {
+        val currentIdNum = realm!!.where(Admin_Table::class.java!!).max("id")
+        val nextId: Int
+        nextId = when(currentIdNum){
+            null -> {
+                1
+            }
+            else -> {
+                currentIdNum!!.toInt() + 1
+            }
+        }
+
+        var admin = Admin_Table()
+        admin.id = nextId
+        admin.admin_id = id
+        admin.admin_password = pwd
+        addData(admin)
+    }
+
 
     //Insert To Realm
     fun <T : RealmObject> addData(data: T) {

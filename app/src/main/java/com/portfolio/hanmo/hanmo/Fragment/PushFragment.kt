@@ -6,7 +6,6 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.portfolio.hanmo.hanmo.MainActivity
 import com.portfolio.hanmo.hanmo.R
 
 /**
@@ -26,7 +25,6 @@ class PushFragment : BaseFragment() {
             }
             false
         })
-
 
         return rootView
     }

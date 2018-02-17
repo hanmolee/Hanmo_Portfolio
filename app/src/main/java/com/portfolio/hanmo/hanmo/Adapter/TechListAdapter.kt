@@ -2,8 +2,11 @@ package com.portfolio.hanmo.hanmo.Adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
+import com.portfolio.hanmo.hanmo.MainActivity
+import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import kotlinx.android.synthetic.main.item_techlist.view.*
 import java.util.ArrayList
@@ -44,6 +47,12 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
         fun bindView(item: TechStack) {
             with(itemView){
                 tech_name_txt.text = item.name
+
+                when(admin){
+                    1 -> { btn_list_minus.visibility = View.VISIBLE }
+                    0 -> { btn_list_minus.visibility = View.INVISIBLE }
+                }
+
             }
 
         }

@@ -1,5 +1,6 @@
 package com.portfolio.hanmo.hanmo.Fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
@@ -8,17 +9,20 @@ import android.util.Log
 import android.view.*
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
+import com.portfolio.hanmo.hanmo.Activity.AdminActivity
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.MainActivity
+import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.fragment_firstview.view.*
 import kotlinx.android.synthetic.main.fragment_pager.view.*
 import kotlinx.android.synthetic.main.fragment_stackpage.view.*
+import kotlinx.android.synthetic.main.item_techlist.view.*
 import org.jetbrains.anko.toast
 
 /**
@@ -39,21 +43,14 @@ class Fragment_Pager : BaseFragment() {
             viewPager.adapter = SparklePageAdapter(this@Fragment_Pager)
             viewPager.setCurrentItem(1, true)
             viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-                }
-
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
                 override fun onPageSelected(position: Int) {
                     when(position) {
                         0 -> { onBackButtonPressed(rootView) }
                         2 -> { onBackButtonPressed(rootView) }
                     }
-
                 }
-
-                override fun onPageScrollStateChanged(state: Int) {
-
-                }
+                override fun onPageScrollStateChanged(state: Int) {}
             })
         }
 
@@ -69,6 +66,22 @@ class Fragment_Pager : BaseFragment() {
             }
             false
         })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(resultCode){
+            100 -> {
+                toast("성공")
+                val ft = fragmentManager.beginTransaction()
+                ft.detach(this).attach(this).commit()
+            }
+            else -> {
+                toast("실패")
+                val ft = fragmentManager.beginTransaction()
+                ft.detach(this).attach(this).commit()
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private class SparklePageAdapter(thisContext: Fragment_Pager) : ViewPagerAdapter() {
@@ -176,6 +189,12 @@ class Fragment_Pager : BaseFragment() {
                 run_count != null -> {
                     var count = run_count.count!!
                     rootView.count.text = "count : " + count.toString()
+                }
+            }
+            with(rootView.btn_admin_login){
+                setOnClickListener {
+                    val admin_intent = Intent(context, AdminActivity::class.java)
+                    _thisContext.startActivityForResult(admin_intent, 111)
                 }
             }
 

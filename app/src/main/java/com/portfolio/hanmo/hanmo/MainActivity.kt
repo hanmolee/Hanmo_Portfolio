@@ -15,7 +15,9 @@ import com.portfolio.hanmo.hanmo.Util.RealmHelper
  */
 class MainActivity : FragmentActivity() {
 
-    var backStackPosition = 0
+    companion object {
+        var admin = 0
+    }
     var count = 0
     private var isFirstBackClicked = true
 
