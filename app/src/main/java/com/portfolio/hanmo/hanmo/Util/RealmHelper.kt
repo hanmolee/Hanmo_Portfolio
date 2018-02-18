@@ -133,6 +133,15 @@ class RealmHelper private constructor() {
         addData(admin)
     }
 
+    fun deleteStackList(id: Int) {
+        val toEdit = realm!!.where(TechStack_Table::class.java).equalTo("id", id).findFirst()
+
+        realm!!.beginTransaction()
+        toEdit!!.deleteFromRealm()
+        realm!!.commitTransaction()
+
+    }
+
 
     //Insert To Realm
     fun <T : RealmObject> addData(data: T) {

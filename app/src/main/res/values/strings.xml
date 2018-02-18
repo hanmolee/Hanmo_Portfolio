@@ -2,5 +2,7 @@
     <string name="app_name">Hanmo</string>
 
     <string name="createRealm">first</string>
+    <string name="item_all_delete">아이템 <font color='#54a2fe'>모두 삭제</font></string>
+    <string name="item_add">+ 추가하기</string>
 
 </resources>

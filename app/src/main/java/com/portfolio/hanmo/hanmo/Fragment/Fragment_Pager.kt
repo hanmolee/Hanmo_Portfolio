@@ -12,6 +12,9 @@ import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.portfolio.hanmo.hanmo.Activity.AdminActivity
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
+import com.portfolio.hanmo.hanmo.Constants.RequestCodes
+import com.portfolio.hanmo.hanmo.Constants.ResultCodes
+import com.portfolio.hanmo.hanmo.Constants.Type
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
@@ -23,6 +26,8 @@ import kotlinx.android.synthetic.main.fragment_firstview.view.*
 import kotlinx.android.synthetic.main.fragment_pager.view.*
 import kotlinx.android.synthetic.main.fragment_stackpage.view.*
 import kotlinx.android.synthetic.main.item_techlist.view.*
+import kotlinx.android.synthetic.main.view_toolbar_main.*
+import kotlinx.android.synthetic.main.view_toolbar_main.view.*
 import org.jetbrains.anko.toast
 
 /**
@@ -32,22 +37,31 @@ class Fragment_Pager : BaseFragment() {
 
     private var sparkleViewPagerLayout: SparkleViewPagerLayout? = null
     private var sparkleMotion: SparkleMotion? = null
+    val TAG = "메인 페이지"
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var rootView = inflater!!.inflate(R.layout.fragment_pager, container, false)
-
         sparkleViewPagerLayout = rootView.pager_layout
         sparkleMotion = SparkleMotion.with(sparkleViewPagerLayout!!)
 
-        with(sparkleViewPagerLayout!!){
-            viewPager.adapter = SparklePageAdapter(this@Fragment_Pager)
-            viewPager.setCurrentItem(1, true)
-            viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        setTitle("Welcome Page")
+
+        with(sparkleViewPagerLayout!!.viewPager){
+            adapter = SparklePageAdapter(this@Fragment_Pager)
+            setCurrentItem(1, true)
+            setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
                 override fun onPageSelected(position: Int) {
                     when(position) {
-                        0 -> { onBackButtonPressed(rootView) }
-                        2 -> { onBackButtonPressed(rootView) }
+                        0 -> {
+                            setTitle("About Page")
+                            onBackButtonPressed(rootView)
+                        }
+                        1 -> { setTitle("Welcome Page") }
+                        2 -> {
+                            setTitle("Tech Stack Page")
+                            onBackButtonPressed(rootView)
+                        }
                     }
                 }
                 override fun onPageScrollStateChanged(state: Int) {}
@@ -69,26 +83,34 @@ class Fragment_Pager : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(resultCode){
-            100 -> {
-                toast("성공")
-                val ft = fragmentManager.beginTransaction()
-                ft.detach(this).attach(this).commit()
-            }
-            else -> {
-                toast("실패")
-                val ft = fragmentManager.beginTransaction()
-                ft.detach(this).attach(this).commit()
+        when(requestCode) {
+            RequestCodes.ADMIN -> {
+                when(resultCode){
+                    ResultCodes.RESET -> {
+                        //toast("성공")
+                        refreshFragment()
+                    }
+                    else -> {
+                        //toast("실패")
+                        refreshFragment()
+                    }
+                }
             }
         }
+
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun refreshFragment() {
+        val ft = fragmentManager.beginTransaction()
+        ft.detach(this).attach(this).commit()
     }
 
     private class SparklePageAdapter(thisContext: Fragment_Pager) : ViewPagerAdapter() {
 
         var _thisContext = thisContext
 
-        var type : Int = 0
+        var type : Int = Type.list_is_null
 
         override fun getView(position: Int, container: ViewGroup): View? {
             when(position) {
@@ -108,11 +130,11 @@ class Fragment_Pager : BaseFragment() {
         private fun stackViewPage(container: ViewGroup): View? {
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_stackpage, container, false)
 
-            val gestureDetector = GestureDetector(container.context, object : GestureDetector.SimpleOnGestureListener() {
+            /*val gestureDetector = GestureDetector(container.context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onSingleTapUp(e: MotionEvent): Boolean {
                     return true
                 }
-            })
+            })*/
 
             with(rootView.technical_stacklist) {
                 val tech_list = ArrayList<TechStack>()
@@ -120,7 +142,7 @@ class Fragment_Pager : BaseFragment() {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
                 adapter = TechListAdapter(tech_list, type)
-                addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+                /*addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
                     override fun onTouchEvent(rv: RecyclerView?, e: MotionEvent?) {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
@@ -157,7 +179,7 @@ class Fragment_Pager : BaseFragment() {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 
-                })
+                })*/
             }
 
             return rootView
@@ -167,12 +189,23 @@ class Fragment_Pager : BaseFragment() {
             var result = RealmHelper.instance.queryAll(TechStack_Table::class.java)
             when(result){
                 null -> {
-                    type = 0
+                    type = Type.list_is_null
                     Log.d("기술스택", "tech stack list is null!")
                 }
                 else -> {
-                    type = 6
                     result.forEach { tech_list.add(TechStack(it.id, it.tech_name!!)) }
+
+                    when(admin){
+                        1 -> {
+                            type = Type.admin
+                            tech_list.add(TechStack(-1,
+                                _thisContext.resources.getString(R.string.item_add)))
+                        }
+                        else -> {
+                            type = Type.not_admin
+                            Log.d(_thisContext.TAG, "관리자 아님")
+                        }
+                    }
                 }
             }
         }
@@ -194,7 +227,7 @@ class Fragment_Pager : BaseFragment() {
             with(rootView.btn_admin_login){
                 setOnClickListener {
                     val admin_intent = Intent(context, AdminActivity::class.java)
-                    _thisContext.startActivityForResult(admin_intent, 111)
+                    _thisContext.startActivityForResult(admin_intent, RequestCodes.ADMIN)
                 }
             }
 

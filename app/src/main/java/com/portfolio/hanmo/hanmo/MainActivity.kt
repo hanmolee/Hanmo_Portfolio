@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.Fragment.Fragment_Pager
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
+import kotlinx.android.synthetic.main.view_toolbar_main.*
 
 /**
  * Created by hanmo on 2018. 2. 3..
@@ -36,6 +37,10 @@ class MainActivity : FragmentActivity() {
         val fragment_Pager = Fragment_Pager()
         replaceContentFragment(R.id.content_frame, fragment_Pager)
 
+    }
+
+    fun setTitle(title : String){
+        txt_toolbar.text = title
     }
 
     fun replaceFragment(fragment: android.app.Fragment) {

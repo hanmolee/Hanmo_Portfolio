@@ -18,4 +18,14 @@ open class BaseFragment : android.app.Fragment() {
         }
     }
 
+    fun setTitle(title : String) {
+        if (activity == null)
+            return
+
+        if (activity is MainActivity) {
+            val ma = activity as MainActivity
+            ma.setTitle(title)
+        }
+    }
+
 }

@@ -1,14 +1,18 @@
 package com.portfolio.hanmo.hanmo.Adapter
 
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.portfolio.hanmo.hanmo.Constants.Type
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
+import com.portfolio.hanmo.hanmo.Fragment.PushFragment
 import com.portfolio.hanmo.hanmo.MainActivity
-import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
+import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.item_techlist.view.*
+import org.jetbrains.anko.toast
 import java.util.ArrayList
 
 /**
@@ -16,12 +20,11 @@ import java.util.ArrayList
  */
 class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val haslist = 6
-    val notlist = 0
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         when(viewType){
-            haslist -> return TechListHolder(parent!!)
+            Type.not_admin -> return TechListHolder(parent!!)
+            Type.admin -> return TechListHolder_admin(parent!!)
             //notlist -> {  }
         }
         throw IllegalArgumentException()
@@ -34,6 +37,7 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
         when(holder) {
             is TechListHolder -> holder.bindView(items[position])
+            is TechListHolder_admin -> holder.bindView(items[position])
         }
     }
 
@@ -47,15 +51,60 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
         fun bindView(item: TechStack) {
             with(itemView){
                 tech_name_txt.text = item.name
+                btn_list_minus.visibility = View.INVISIBLE
+                itemView.setOnClickListener {
+                    when(item.id){
+                        0 -> {
+                            var stack01 = PushFragment()
+                            (context as MainActivity).replaceFragment(stack01)
+                        }
+                    }
+                }
+            }
 
-                when(admin){
-                    1 -> { btn_list_minus.visibility = View.VISIBLE }
-                    0 -> { btn_list_minus.visibility = View.INVISIBLE }
+        }
+    }
+
+    inner class TechListHolder_admin(parent: ViewGroup) : RecyclerView.ViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_techlist, parent, false)){
+
+        fun bindView(item: TechStack) {
+            with(itemView){
+
+                with(tech_name_txt){
+                    text = item.name
+                    setOnClickListener{
+                        when(item.id){
+                            -1 -> {
+                                context.toast("추가하기!")
+                            }
+                            0 -> {
+                                var stack01 = PushFragment()
+                                (context as MainActivity).replaceFragment(stack01)
+                            }
+                        }
+                    }
+                }
+
+                with(btn_list_minus) {
+                    visibility = View.VISIBLE
+                    setOnClickListener {
+                        val stack_id = item.id
+                        RealmHelper.instance.deleteStackList(stack_id)
+                        items.removeAt(position)
+                        notifyItemRemoved(position)
+                    }
+                }
+
+                when(item.id){
+                    -1 -> {
+                        btn_list_minus.visibility = View.INVISIBLE
+                        tech_name_txt.setTextColor(Color.parseColor("#8E75A7"))
+                    }
                 }
 
             }
 
         }
     }
-
 }
