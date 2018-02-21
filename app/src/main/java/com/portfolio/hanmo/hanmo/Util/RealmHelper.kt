@@ -142,6 +142,10 @@ class RealmHelper private constructor() {
 
     }
 
+    fun <T : RealmObject> queryResults(clazz: Class<T>, result: String): RealmResults<T> {
+        return realm!!.where(clazz).contains("tech_name", result).findAll()
+    }
+
 
     //Insert To Realm
     fun <T : RealmObject> addData(data: T) {
@@ -185,7 +189,6 @@ class RealmHelper private constructor() {
                 return INSTANCE as RealmHelper
             }
     }
-
 
 
 

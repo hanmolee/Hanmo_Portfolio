@@ -38,12 +38,12 @@ abstract class ViewPagerAdapter : PagerAdapter() {
      * @return Returns an Object representing the new page. This does not need
      * to be a View, but can be some other container of the page.
      */
-    override fun instantiateItem(container: ViewGroup, position: Int): Any? {
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = getView(position, container)
         if (view != null) {
             container.addView(view)
         }
-        return view
+        return view!!
     }
 
     /**

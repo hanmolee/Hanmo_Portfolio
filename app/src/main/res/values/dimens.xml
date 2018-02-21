@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="et_view">1.5dp</dimen>
-    <dimen name="toolbar_view">0.7dp</dimen>
+    <dimen name="toolbar_view">1dp</dimen>
     <dimen name="toolbar_btn_back">48dp</dimen>
     <dimen name="txt_toolbar">20sp</dimen>
 </resources>

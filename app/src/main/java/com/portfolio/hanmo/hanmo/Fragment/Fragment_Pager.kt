@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.*
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
+import com.portfolio.hanmo.hanmo.Activity.AddTechStackActivity
 import com.portfolio.hanmo.hanmo.Activity.AdminActivity
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
@@ -224,9 +225,11 @@ class Fragment_Pager : BaseFragment() {
                     rootView.count.text = "count : " + count.toString()
                 }
             }
+
+
             with(rootView.btn_admin_login){
                 setOnClickListener {
-                    val admin_intent = Intent(context, AdminActivity::class.java)
+                    val admin_intent = Intent(context, AddTechStackActivity::class.java)
                     _thisContext.startActivityForResult(admin_intent, RequestCodes.ADMIN)
                 }
             }

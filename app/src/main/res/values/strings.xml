@@ -4,5 +4,8 @@
     <string name="createRealm">first</string>
     <string name="item_all_delete">아이템 <font color='#54a2fe'>모두 삭제</font></string>
     <string name="item_add">+ 추가하기</string>
+    <string name="txt_tech_name">기술명</string>
+    <string name="txt_tech_content">기술 내용</string>
+    <string name="search_hint">search..</string>
 
 </resources>

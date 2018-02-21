@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.portfolio.hanmo.hanmo.Constants.Type
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
+import com.portfolio.hanmo.hanmo.Fragment.Fragment_Pager
 import com.portfolio.hanmo.hanmo.Fragment.PushFragment
 import com.portfolio.hanmo.hanmo.MainActivity
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_techlist.view.*
 import org.jetbrains.anko.toast
 import java.util.ArrayList
@@ -25,6 +27,7 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
         when(viewType){
             Type.not_admin -> return TechListHolder(parent!!)
             Type.admin -> return TechListHolder_admin(parent!!)
+            Type.search_result -> return TechListHolder_results(parent!!)
             //notlist -> {  }
         }
         throw IllegalArgumentException()
@@ -38,11 +41,35 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
         when(holder) {
             is TechListHolder -> holder.bindView(items[position])
             is TechListHolder_admin -> holder.bindView(items[position])
+            is TechListHolder_results -> holder.bindView(items[position])
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return type
+    }
+
+    inner class TechListHolder_results(parent: ViewGroup) : RecyclerView.ViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_techlist, parent, false)){
+
+        fun bindView(item: TechStack) {
+            with(itemView){
+                tech_name_txt.visibility = View.INVISIBLE
+                btn_list_minus.visibility = View.INVISIBLE
+                tech_result.visibility = View.VISIBLE
+                tech_result.text = item.name
+                itemView.setOnClickListener {
+                    when(item.id){
+                        0 -> {
+                            var stack01 = PushFragment()
+                            (context as MainActivity).replaceFragment(stack01)
+                            (context as MainActivity).list_search_results.visibility = View.INVISIBLE
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     inner class TechListHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
@@ -76,7 +103,7 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
                     setOnClickListener{
                         when(item.id){
                             -1 -> {
-                                context.toast("추가하기!")
+                                //(context as Fragment_Pager).startActivityForResult()
                             }
                             0 -> {
                                 var stack01 = PushFragment()
