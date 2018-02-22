@@ -6,13 +6,11 @@ import android.util.Log
 import com.portfolio.hanmo.hanmo.Activity.AdminActivity
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
+import com.portfolio.hanmo.hanmo.DataModel.SearchResult_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmObject
-import io.realm.RealmResults
+import io.realm.*
 import org.jetbrains.anko.toast
 
 /**
@@ -75,6 +73,43 @@ class RealmHelper private constructor() {
                     tech.id = i
                     tech.tech_name = name[i]
                     addData(tech)
+                }
+            }
+        }
+    }
+
+    fun <T : RealmObject> selectSearchResult(clazz: Class<T>): RealmResults<T> {
+        return realm!!.where(clazz).findAll().sort("search_time", Sort.DESCENDING).where().distinct("result")
+    }
+
+    fun insertSearchResult(name: String) {
+        val currentIdNum = realm!!.where(SearchResult_Table::class.java!!).max("id")
+        val nextId: Int
+        nextId = when(currentIdNum){
+            null -> {
+                1
+            }
+            else -> {
+                currentIdNum!!.toInt() + 1
+            }
+        }
+        val result = SearchResult_Table()
+        result.id = nextId
+        result.result = name
+        result.search_time = System.currentTimeMillis()
+        addData(result)
+
+    }
+
+    fun updateSearchResult(result: String) {
+        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", result).findAll()
+        when(toEdit.size){
+            0 -> {  }
+            else -> {
+                toEdit.forEach {
+                    realm!!.beginTransaction()
+                    it.search_time = System.currentTimeMillis()
+                    realm!!.commitTransaction()
                 }
             }
         }
@@ -189,8 +224,5 @@ class RealmHelper private constructor() {
                 return INSTANCE as RealmHelper
             }
     }
-
-
-
 
 }

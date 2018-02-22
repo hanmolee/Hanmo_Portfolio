@@ -22,6 +22,7 @@ import android.view.inputmethod.InputMethodManager
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Constants.Type
+import com.portfolio.hanmo.hanmo.DataModel.SearchResult_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.Util.ResizeWidthAnimation
@@ -73,15 +74,18 @@ class MainActivity : FragmentActivity() {
                     }
                     btn_search.visibility = View.INVISIBLE
                     btn_close.visibility = View.VISIBLE
-                    val anim = ResizeWidthAnimation(et_search, 1000)
-                    anim.duration = 2000
-                    anim.interpolator = LinearInterpolator()
-                    et_search.startAnimation(anim)
+
+                    //val anim = ResizeWidthAnimation(et_search, 1000)
+                    //anim.duration = 2000
+                    //anim.interpolator = LinearInterpolator()
+                    //et_search.startAnimation(anim)
 
                     var result_list = ArrayList<TechStack>()
                     val results = RealmHelper.instance.queryAll(TechStack_Table::class.java)
                     when(results.size){
-                        0 -> {  }
+                        0 -> {
+                            //검색결과가 없습니다
+                             }
                         else -> {
                             results.forEach {
                                 result_list.add(TechStack(it.id, it.tech_name!!))
@@ -91,20 +95,45 @@ class MainActivity : FragmentActivity() {
 
                     with(list_search_results){
                         visibility = View.VISIBLE
-                        adapter = TechListAdapter(result_list, Type.search_result)
+                        adapter = TechListAdapter(result_list, Type.result)
                     }
 
                 }.subscribe{
                     et_search.textChanges()
                             .subscribe {
-                                var result_list = ArrayList<TechStack>()
-                                val results = RealmHelper.instance.queryResults(TechStack_Table::class.java, it.toString())
-                                results.forEach{
-                                    result_list.add(TechStack(it.id, it.tech_name!!))
-                                }
-                                with(list_search_results){
-                                    visibility = View.VISIBLE
-                                    adapter = TechListAdapter(result_list, Type.search_result)
+                                when(et_search.length()){
+                                    0 -> {
+                                        var search_result = ArrayList<TechStack>()
+                                        val results = RealmHelper.instance.selectSearchResult(SearchResult_Table::class.java)
+                                        when(results.size) {
+                                            0 -> {
+                                                search_result.add(TechStack(-1, "검색결과 모두 삭제"))
+                                            }
+                                            else -> {
+                                                results.forEach{
+                                                    search_result.add(TechStack(it.id, it.result!!))
+                                                }
+                                                search_result.add(TechStack(-1, "검색결과 모두 삭제"))
+                                            }
+                                        }
+
+                                        with(list_search_results){
+                                            visibility = View.VISIBLE
+                                            adapter = TechListAdapter(search_result, Type.search_result)
+                                        }
+                                    }
+                                    else -> {
+                                        var result_list = ArrayList<TechStack>()
+                                        val result = it.toString().trim()
+                                        val results = RealmHelper.instance.queryResults(TechStack_Table::class.java, result)
+                                        results.forEach{
+                                            result_list.add(TechStack(it.id, it.tech_name!!))
+                                        }
+                                        with(list_search_results){
+                                            visibility = View.VISIBLE
+                                            adapter = TechListAdapter(result_list, Type.result)
+                                        }
+                                    }
                                 }
                             }
                 }

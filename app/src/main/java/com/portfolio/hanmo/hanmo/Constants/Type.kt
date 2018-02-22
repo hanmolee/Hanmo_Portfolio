@@ -7,5 +7,6 @@ object Type {
     val list_is_null = 0
     val admin = 6
     val not_admin = 7
-    val search_result = 8
+    val result = 8
+    val search_result = 9
 }
