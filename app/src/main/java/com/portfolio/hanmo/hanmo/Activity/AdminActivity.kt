@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.portfolio.hanmo.hanmo.Constants.ResultCodes
 import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
+import com.portfolio.hanmo.hanmo.MainActivity
 import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
@@ -48,7 +49,10 @@ class AdminActivity : Activity(), View.OnClickListener {
                 var results = RealmHelper.instance.queryAll(Admin_Table::class.java)
                 when(results.size) {
                     0 -> { toast("관리자 아이디가 존재하지 않습니다. \n관리자 아이디를 생성해 주세요!") }
-                    else -> { RealmHelper.instance.adminLogin(this, id, pwd) }
+                    else -> {
+                        MainActivity.admin_id = id
+                        RealmHelper.instance.adminLogin(this, id, pwd)
+                    }
                 }
             }
         }

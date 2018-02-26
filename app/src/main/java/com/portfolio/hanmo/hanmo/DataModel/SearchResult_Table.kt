@@ -20,6 +20,9 @@ open class SearchResult_Table : RealmObject() {
 
     open var search_time : Long? = 0
 
-    var tech_list : RealmList<TechStack_Table>? = null
+    //var tech_list : RealmList<TechStack_Table>? = null
+
+    @LinkingObjects("history")
+    val search_history : RealmResults<Admin_Table>? = null
 
 }

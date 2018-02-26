@@ -8,6 +8,7 @@ import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
 import com.portfolio.hanmo.hanmo.DataModel.SearchResult_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.MainActivity
 import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
@@ -101,19 +102,16 @@ class RealmHelper private constructor() {
         result.id = nextId
         result.result = name
         result.search_time = System.currentTimeMillis()
-        var test = queryAll(TechStack_Table::class.java)
+        /*var test = queryAll(TechStack_Table::class.java)
         val list = RealmList<TechStack_Table>()
-
-
         test.forEach {
             val techlist = TechStack_Table()
             techlist.id = it.id
             techlist.tech_name = it.tech_name
             list.add(techlist)
         }
-        result.tech_list = list
+        result.tech_list = list*/
         realm!!.copyToRealmOrUpdate(result)
-
         realm!!.commitTransaction()
 
     }
@@ -182,7 +180,45 @@ class RealmHelper private constructor() {
         admin.id = nextId
         admin.admin_id = id
         admin.admin_password = pwd
-        addData(admin)
+        val count = queryAll(Active_Count_Table::class.java)
+        val history = queryAll(SearchResult_Table::class.java)
+        val count_list = RealmList<Active_Count_Table>()
+        val history_list = RealmList<SearchResult_Table>()
+        when(count.size) {
+            0 -> {
+                Log.e("count", "count is null")
+            }
+            else -> {
+                count.forEach {
+                    val cnt = Active_Count_Table()
+                    cnt.id = it.id
+                    cnt.count = it.count
+                    count_list.add(cnt)
+                }
+            }
+        }
+        when(history.size) {
+            0 -> { Log.e("history", "history is null") }
+            else -> {
+                history.forEach {
+                    val hst = SearchResult_Table()
+                    hst.id = it.id
+                    hst.result = it.result
+                    hst.search_time = it.search_time
+                    history_list.add(hst)
+                }
+            }
+        }
+
+        admin.history = history_list
+        admin.count = count_list
+        realm!!.beginTransaction()
+        realm!!.copyToRealmOrUpdate(admin)
+        realm!!.commitTransaction()
+    }
+
+    fun <T : RealmObject> testQuery(clazz: Class<T>) : T?{
+        return realm!!.where(clazz).equalTo("admin_id", MainActivity.admin_id).findFirst()
     }
 
     fun deleteStackList(id: Int) {

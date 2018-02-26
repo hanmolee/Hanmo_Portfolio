@@ -17,6 +17,7 @@ import com.portfolio.hanmo.hanmo.Constants.RequestCodes
 import com.portfolio.hanmo.hanmo.Constants.ResultCodes
 import com.portfolio.hanmo.hanmo.Constants.Type
 import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
+import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.MainActivity
@@ -217,19 +218,30 @@ class Fragment_Pager : BaseFragment() {
 
         private fun firstViewPage(container: ViewGroup): View? {
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_firstview, container, false)
+            when(admin) {
+                0 -> {
+                    rootView.count.text = "count : nullllllll "
+                }
+                1 -> {
+                    val run_count = RealmHelper.instance.testQuery(Admin_Table::class.java)
+                    when(run_count) {
+                        null -> {
 
-            val run_count = RealmHelper.instance.queryFirst(Active_Count_Table::class.java)
-            when{
-                run_count != null -> {
-                    var count = run_count.count!!
-                    rootView.count.text = "count : " + count.toString()
+                        }
+                        else -> {
+                            run_count.count?.forEach {
+                                rootView.count.text = "count : " + it.count.toString()
+                            }
+                        }
+
+                    }
                 }
             }
 
 
             with(rootView.btn_admin_login){
                 setOnClickListener {
-                    val admin_intent = Intent(context, AddTechStackActivity::class.java)
+                    val admin_intent = Intent(context, AdminActivity::class.java)
                     _thisContext.startActivityForResult(admin_intent, RequestCodes.ADMIN)
                 }
             }

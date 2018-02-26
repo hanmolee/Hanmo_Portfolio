@@ -1,6 +1,8 @@
 package com.portfolio.hanmo.hanmo.DataModel
 
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 
@@ -14,5 +16,8 @@ open class Active_Count_Table : RealmObject() {
     open var id : Int = 0
 
     open var count : Int? = 0
+
+    @LinkingObjects("count")
+    val search_history : RealmResults<Admin_Table>? = null
 
 }

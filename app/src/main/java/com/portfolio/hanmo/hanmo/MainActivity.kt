@@ -13,7 +13,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.widget.Toast
 import com.jakewharton.rxbinding2.view.clicks
-import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
 import com.portfolio.hanmo.hanmo.Fragment.Fragment_Pager
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.view_toolbar_main.*
@@ -23,9 +22,7 @@ import android.view.inputmethod.InputMethodManager
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Constants.Type
-import com.portfolio.hanmo.hanmo.DataModel.SearchResult_Table
-import com.portfolio.hanmo.hanmo.DataModel.TechStack
-import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.DataModel.*
 import com.portfolio.hanmo.hanmo.Util.ResizeWidthAnimation
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_techlist.*
@@ -39,6 +36,7 @@ class MainActivity : FragmentActivity() {
 
     companion object {
         var admin = 0
+        var admin_id = ""
     }
     var count = 0
     private var isFirstBackClicked = true
@@ -54,18 +52,24 @@ class MainActivity : FragmentActivity() {
         }
 
 
-        val test_result = RealmHelper.instance.queryAll(TechStack_Table::class.java)
+        /*val test_result = RealmHelper.instance.queryAll(TechStack_Table::class.java)
         test_result.forEach {
             var ddd = it.search_result?.size
             var kkk = 2
         }
 
         val test_2 = RealmHelper.instance.test(TechStack_Table::class.java)
-        test_2.forEach {
-            var kk2 = it.tech_name
-            var kkk3 = it.id
-            var kk3 = it.search_result?.size
+        when(test_2.size) {
+            0 -> {Log.e("test", "result is null!!")}
+            else -> {
+                test_2.forEach {
+                    Log.e("test name", it.tech_name)
+                    Log.e("test id", it.id.toString())
+                    Log.e("test size", it.search_result?.size.toString())
+                }
+            }
         }
+*/
 
         btn_search.clicks()
                 .doOnNext {
@@ -148,20 +152,20 @@ class MainActivity : FragmentActivity() {
     fun clickSearchButton() {
 
         val search_result = ArrayList<TechStack>()
-        val results = RealmHelper.instance.selectSearchResult(SearchResult_Table::class.java)
+        val results = RealmHelper.instance.testQuery(Admin_Table::class.java)
 
-        when(results.size){
-            0 -> {
+        when(results){
+            null -> {
                 search_result.add(TechStack(-2, "검색 히스토리가 없습니다"))
             }
             else -> {
 
-                when(results.size) {
+                when(results.history?.size) {
                     0 -> {
                         search_result.add(TechStack(-1, "검색결과 모두 삭제"))
                     }
                     else -> {
-                        results.forEach{
+                        results.history?.forEach {
                             search_result.add(TechStack(it.id, it.result!!))
                         }
                         search_result.add(TechStack(-1, "검색결과 모두 삭제"))
