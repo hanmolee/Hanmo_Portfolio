@@ -57,7 +57,7 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
         fun bindView(item: TechStack) {
             with(itemView){
                 when(item.id){
-                    -1 -> {
+                    -1, -2 -> {
                         with(txt_search_result){
                             text = item.name
                             gravity = Gravity.CENTER
@@ -96,6 +96,8 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
                 tech_result.visibility = View.VISIBLE
                 tech_result.text = item.name
                 itemView.setOnClickListener {
+
+                    (context as MainActivity).hideKeyboard()
 
                     RealmHelper.instance.insertSearchResult(item.name)
 

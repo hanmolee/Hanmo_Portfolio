@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.widget.Toast
@@ -27,6 +28,7 @@ import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
 import com.portfolio.hanmo.hanmo.Util.ResizeWidthAnimation
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.item_techlist.*
 import org.jetbrains.anko.toast
 
 
@@ -51,6 +53,20 @@ class MainActivity : FragmentActivity() {
             layoutManager = LinearLayoutManager(context)
         }
 
+
+        val test_result = RealmHelper.instance.queryAll(TechStack_Table::class.java)
+        test_result.forEach {
+            var ddd = it.search_result?.size
+            var kkk = 2
+        }
+
+        val test_2 = RealmHelper.instance.test(TechStack_Table::class.java)
+        test_2.forEach {
+            var kk2 = it.tech_name
+            var kkk3 = it.id
+            var kk3 = it.search_result?.size
+        }
+
         btn_search.clicks()
                 .doOnNext {
                     et_search.visibility = View.VISIBLE
@@ -62,8 +78,7 @@ class MainActivity : FragmentActivity() {
                                         toast("검색어를 한글자 이상 입력해주세요")
                                     }
                                     else -> {
-                                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                        imm!!.hideSoftInputFromWindow(view.windowToken, 0)
+                                        hideKeyboard()
                                     }
                                 }
                                 true
@@ -75,52 +90,14 @@ class MainActivity : FragmentActivity() {
                     btn_search.visibility = View.INVISIBLE
                     btn_close.visibility = View.VISIBLE
 
-                    //val anim = ResizeWidthAnimation(et_search, 1000)
-                    //anim.duration = 2000
-                    //anim.interpolator = LinearInterpolator()
-                    //et_search.startAnimation(anim)
-
-                    var result_list = ArrayList<TechStack>()
-                    val results = RealmHelper.instance.queryAll(TechStack_Table::class.java)
-                    when(results.size){
-                        0 -> {
-                            //검색결과가 없습니다
-                             }
-                        else -> {
-                            results.forEach {
-                                result_list.add(TechStack(it.id, it.tech_name!!))
-                            }
-                        }
-                    }
-
-                    with(list_search_results){
-                        visibility = View.VISIBLE
-                        adapter = TechListAdapter(result_list, Type.result)
-                    }
+                    clickSearchButton()
 
                 }.subscribe{
                     et_search.textChanges()
                             .subscribe {
                                 when(et_search.length()){
                                     0 -> {
-                                        var search_result = ArrayList<TechStack>()
-                                        val results = RealmHelper.instance.selectSearchResult(SearchResult_Table::class.java)
-                                        when(results.size) {
-                                            0 -> {
-                                                search_result.add(TechStack(-1, "검색결과 모두 삭제"))
-                                            }
-                                            else -> {
-                                                results.forEach{
-                                                    search_result.add(TechStack(it.id, it.result!!))
-                                                }
-                                                search_result.add(TechStack(-1, "검색결과 모두 삭제"))
-                                            }
-                                        }
-
-                                        with(list_search_results){
-                                            visibility = View.VISIBLE
-                                            adapter = TechListAdapter(search_result, Type.search_result)
-                                        }
+                                        clickSearchButton()
                                     }
                                     else -> {
                                         var result_list = ArrayList<TechStack>()
@@ -138,12 +115,10 @@ class MainActivity : FragmentActivity() {
                             }
                 }
 
-
         btn_close.clicks()
-                .subscribe{et_search.visibility = View.INVISIBLE
-                    btn_search.visibility = View.VISIBLE
-                    btn_close.visibility = View.INVISIBLE
-                    list_search_results.visibility = View.INVISIBLE}
+                .subscribe{
+                    invisibleView()
+                }
 
         val run_count = RealmHelper.instance.queryFirst(Active_Count_Table::class.java)
         when{
@@ -156,6 +131,49 @@ class MainActivity : FragmentActivity() {
         val fragment_Pager = Fragment_Pager()
         replaceContentFragment(R.id.content_frame, fragment_Pager)
 
+    }
+
+    fun invisibleView() {
+        et_search.visibility = View.INVISIBLE
+        btn_search.visibility = View.VISIBLE
+        btn_close.visibility = View.INVISIBLE
+        list_search_results.visibility = View.INVISIBLE
+    }
+
+    fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm!!.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun clickSearchButton() {
+
+        val search_result = ArrayList<TechStack>()
+        val results = RealmHelper.instance.selectSearchResult(SearchResult_Table::class.java)
+
+        when(results.size){
+            0 -> {
+                search_result.add(TechStack(-2, "검색 히스토리가 없습니다"))
+            }
+            else -> {
+
+                when(results.size) {
+                    0 -> {
+                        search_result.add(TechStack(-1, "검색결과 모두 삭제"))
+                    }
+                    else -> {
+                        results.forEach{
+                            search_result.add(TechStack(it.id, it.result!!))
+                        }
+                        search_result.add(TechStack(-1, "검색결과 모두 삭제"))
+
+                    }
+                }
+            }
+        }
+        with(list_search_results){
+            visibility = View.VISIBLE
+            adapter = TechListAdapter(search_result, Type.search_result)
+        }
     }
 
     fun setTitle(title : String){
@@ -182,5 +200,9 @@ class MainActivity : FragmentActivity() {
                 super.onBackPressed()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

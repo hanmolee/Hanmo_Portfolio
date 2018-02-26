@@ -1,6 +1,9 @@
 package com.portfolio.hanmo.hanmo.DataModel
 
+import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 
@@ -14,4 +17,8 @@ open class TechStack_Table : RealmObject() {
     open var id : Int = 0
 
     open var tech_name : String? = null
+
+    @LinkingObjects("tech_list")
+    val search_result : RealmResults<SearchResult_Table>? = null
+
 }

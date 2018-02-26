@@ -1,6 +1,9 @@
 package com.portfolio.hanmo.hanmo.DataModel
 
+import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 
@@ -16,5 +19,7 @@ open class SearchResult_Table : RealmObject() {
     open var result : String? = null
 
     open var search_time : Long? = 0
+
+    var tech_list : RealmList<TechStack_Table>? = null
 
 }

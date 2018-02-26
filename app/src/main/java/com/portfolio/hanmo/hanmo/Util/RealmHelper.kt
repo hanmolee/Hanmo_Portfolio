@@ -12,6 +12,9 @@ import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
 import org.jetbrains.anko.toast
+import io.realm.RealmList
+
+
 
 /**
  * Created by hanmo on 2018. 2. 3..
@@ -93,11 +96,25 @@ class RealmHelper private constructor() {
                 currentIdNum!!.toInt() + 1
             }
         }
+        realm!!.beginTransaction()
         val result = SearchResult_Table()
         result.id = nextId
         result.result = name
         result.search_time = System.currentTimeMillis()
-        addData(result)
+        var test = queryAll(TechStack_Table::class.java)
+        val list = RealmList<TechStack_Table>()
+
+
+        test.forEach {
+            val techlist = TechStack_Table()
+            techlist.id = it.id
+            techlist.tech_name = it.tech_name
+            list.add(techlist)
+        }
+        result.tech_list = list
+        realm!!.copyToRealmOrUpdate(result)
+
+        realm!!.commitTransaction()
 
     }
 
@@ -179,6 +196,10 @@ class RealmHelper private constructor() {
 
     fun <T : RealmObject> queryResults(clazz: Class<T>, result: String): RealmResults<T> {
         return realm!!.where(clazz).contains("tech_name", result).findAll()
+    }
+
+    fun <T : RealmObject>test(clazz: Class<T>) : RealmResults<T> {
+        return realm!!.where(clazz).equalTo("search_result.result", "tech 04").and().equalTo("tech_name", "tech 04").findAll()
     }
 
 
