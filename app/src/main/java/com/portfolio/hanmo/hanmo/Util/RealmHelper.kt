@@ -65,7 +65,18 @@ class RealmHelper private constructor() {
                 var count_table = Active_Count_Table()
                 count_table.id = 1
                 count_table.count = 1
-                addData(count_table)
+                val adminList = RealmList<Admin_Table>()
+                val admin_result = queryAll(Admin_Table::class.java)
+                when(admin_result.size) {
+                    0 -> {
+                        val admin = Admin_Table()
+                        adminList.add(admin)
+                    }
+                }
+                count_table.admin = adminList
+                realm!!.beginTransaction()
+                realm!!.copyToRealmOrUpdate(count_table)
+                realm!!.commitTransaction()
             }
         }
         when(tect_list) {
@@ -97,7 +108,6 @@ class RealmHelper private constructor() {
                 currentIdNum!!.toInt() + 1
             }
         }
-        realm!!.beginTransaction()
         val result = SearchResult_Table()
         result.id = nextId
         result.result = name
@@ -111,19 +121,41 @@ class RealmHelper private constructor() {
             list.add(techlist)
         }
         result.tech_list = list*/
+        val admin_result = queryAll(Admin_Table::class.java)
+        val adminList = RealmList<Admin_Table>()
+        when(admin_result.size) {
+            0 -> {
+                val admin = Admin_Table()
+                adminList.add(admin)
+            }
+            else -> {
+                admin_result.forEach {
+                    val admin = Admin_Table()
+                    admin.id = it.id
+                    admin.admin_id = it.admin_id
+                    admin.admin_password = it.admin_password
+                    adminList.add(admin)
+                }
+            }
+        }
+        result.admin = adminList
+
+        realm!!.beginTransaction()
         realm!!.copyToRealmOrUpdate(result)
         realm!!.commitTransaction()
 
     }
 
     fun updateSearchResult(result: String) {
-        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", result).findAll()
+        val toEdit = realm!!.where(Admin_Table::class.java).equalTo("history.result", result).findAll()
         when(toEdit.size){
             0 -> {  }
             else -> {
                 toEdit.forEach {
                     realm!!.beginTransaction()
-                    it.search_time = System.currentTimeMillis()
+                    it.history?.forEach {
+                        it.search_time = System.currentTimeMillis()
+                    }
                     realm!!.commitTransaction()
                 }
             }
@@ -180,7 +212,7 @@ class RealmHelper private constructor() {
         admin.id = nextId
         admin.admin_id = id
         admin.admin_password = pwd
-        val count = queryAll(Active_Count_Table::class.java)
+        /*val count = queryAll(Active_Count_Table::class.java)
         val history = queryAll(SearchResult_Table::class.java)
         val count_list = RealmList<Active_Count_Table>()
         val history_list = RealmList<SearchResult_Table>()
@@ -205,6 +237,7 @@ class RealmHelper private constructor() {
                     hst.id = it.id
                     hst.result = it.result
                     hst.search_time = it.search_time
+                    Log.e("history value", "id : " + it.id + ", result : " + it.result)
                     history_list.add(hst)
                 }
             }
@@ -214,7 +247,9 @@ class RealmHelper private constructor() {
         admin.count = count_list
         realm!!.beginTransaction()
         realm!!.copyToRealmOrUpdate(admin)
-        realm!!.commitTransaction()
+        realm!!.commitTransaction()*/
+        addData(admin)
+
     }
 
     fun <T : RealmObject> testQuery(clazz: Class<T>) : T?{
@@ -226,6 +261,26 @@ class RealmHelper private constructor() {
 
         realm!!.beginTransaction()
         toEdit!!.deleteFromRealm()
+        realm!!.commitTransaction()
+
+    }
+
+    fun testDelete(name: String) {
+        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", name).findAll()
+
+        realm!!.beginTransaction()
+        toEdit!!.deleteAllFromRealm()
+        realm!!.commitTransaction()
+
+    }
+
+    fun testupdate(name: String) {
+        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", name).findAll()
+
+        realm!!.beginTransaction()
+        toEdit.forEach {
+            it.result = "이름을 바꿔라"
+        }
         realm!!.commitTransaction()
 
     }

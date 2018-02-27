@@ -71,13 +71,18 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
 
                 itemView.setOnClickListener {
 
-                    RealmHelper.instance.updateSearchResult(item.name)
+                    //RealmHelper.instance.testDelete(item.name)
+                    //RealmHelper.instance.updateSearchResult(item.name)
 
-                    when(item.id){
+                    when(position){
                         0 -> {
-                            var stack01 = PushFragment()
+                            /*var stack01 = PushFragment()
                             (context as MainActivity).replaceFragment(stack01)
-                            (context as MainActivity).list_search_results.visibility = View.INVISIBLE
+                            (context as MainActivity).list_search_results.visibility = View.INVISIBLE*/
+                            RealmHelper.instance.testupdate(item.name)
+                        }
+                        1 -> {
+                            RealmHelper.instance.testDelete(item.name)
                         }
                     }
                 }
