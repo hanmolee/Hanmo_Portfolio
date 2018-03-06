@@ -23,6 +23,8 @@
     <Button
         android:id="@+id/btn_admin_login"
         android:text="관리자로 로그인"
+        android:elevation="6dp"
+        android:stateListAnimator="@drawable/anim_test"
         android:textSize="15sp"
         android:padding="15dp"
         android:background="#ffffff"

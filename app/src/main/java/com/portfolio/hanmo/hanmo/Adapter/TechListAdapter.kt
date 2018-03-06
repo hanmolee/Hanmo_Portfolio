@@ -22,6 +22,7 @@ import java.util.ArrayList
  */
 class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    lateinit var itemClickListener : OnItemClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         when(viewType){
@@ -49,6 +50,14 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
 
     override fun getItemViewType(position: Int): Int {
         return type
+    }
+
+    fun setOnItemClickListener(itemClickListener : OnItemClickListener) {
+        this.itemClickListener = itemClickListener
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(view : View, position: Int)
     }
 
     inner class TechListHolder_search_result(parent: ViewGroup) : RecyclerView.ViewHolder(
@@ -120,22 +129,21 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
     }
 
     inner class TechListHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_techlist, parent, false)){
+            LayoutInflater.from(parent.context).inflate(R.layout.item_techlist, parent, false)), View.OnClickListener{
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         fun bindView(item: TechStack) {
             with(itemView){
                 tech_name_txt.text = item.name
-                btn_list_minus.visibility = View.INVISIBLE
-                itemView.setOnClickListener {
-                    when(item.id){
-                        0 -> {
-                            var stack01 = PushFragment()
-                            (context as MainActivity).replaceFragment(stack01)
-                        }
-                    }
-                }
             }
 
+        }
+
+        override fun onClick(v: View?) {
+            itemClickListener.onItemClick(itemView, adapterPosition)
         }
     }
 

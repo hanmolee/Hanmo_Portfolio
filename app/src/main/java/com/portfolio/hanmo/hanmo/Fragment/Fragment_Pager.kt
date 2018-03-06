@@ -1,16 +1,21 @@
 package com.portfolio.hanmo.hanmo.Fragment
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.portfolio.hanmo.hanmo.Activity.AddTechStackActivity
 import com.portfolio.hanmo.hanmo.Activity.AdminActivity
+import com.portfolio.hanmo.hanmo.Activity.DetailTechStackActivity
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.Constants.RequestCodes
@@ -40,6 +45,7 @@ class Fragment_Pager : BaseFragment() {
     private var sparkleViewPagerLayout: SparkleViewPagerLayout? = null
     private var sparkleMotion: SparkleMotion? = null
     val TAG = "메인 페이지"
+
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var rootView = inflater!!.inflate(R.layout.fragment_pager, container, false)
@@ -114,6 +120,23 @@ class Fragment_Pager : BaseFragment() {
 
         var type : Int = Type.list_is_null
 
+        private val onItemClickListener = object : TechListAdapter.OnItemClickListener {
+            @RequiresApi(Build.VERSION_CODES.M)
+            override fun onItemClick(view: View, position: Int) {
+
+                val intent = DetailTechStackActivity.newIntent(_thisContext.context, position)
+
+                val techNameHolder = view.findViewById<TextView>(R.id.tech_name_txt)
+
+                val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "techName")
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(_thisContext.activity, holderPair)
+
+                ActivityCompat.startActivity(_thisContext.context, intent, options.toBundle())
+            }
+
+        }
+
         override fun getView(position: Int, container: ViewGroup): View? {
             when(position) {
                 0 -> { return aboutViewPage(container) }
@@ -132,56 +155,15 @@ class Fragment_Pager : BaseFragment() {
         private fun stackViewPage(container: ViewGroup): View? {
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_stackpage, container, false)
 
-            /*val gestureDetector = GestureDetector(container.context, object : GestureDetector.SimpleOnGestureListener() {
-                override fun onSingleTapUp(e: MotionEvent): Boolean {
-                    return true
-                }
-            })*/
-
             with(rootView.technical_stacklist) {
                 val tech_list = ArrayList<TechStack>()
                 getData(tech_list)
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
-                adapter = TechListAdapter(tech_list, type)
-                /*addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
-                    override fun onTouchEvent(rv: RecyclerView?, e: MotionEvent?) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                    }
+                val TechAdapter = TechListAdapter(tech_list, type)
+                TechAdapter.setOnItemClickListener(onItemClickListener)
+                adapter = TechAdapter
 
-                    override fun onInterceptTouchEvent(rv: RecyclerView?, e: MotionEvent?): Boolean {
-                        val child = rootView.technical_stacklist.findChildViewUnder(e!!.x, e!!.y)
-                        when {
-                            child != null && gestureDetector.onTouchEvent(e) -> {
-                                val tech_id = tech_list[rootView.technical_stacklist.getChildAdapterPosition(child)].id
-                                var tech_name = tech_list[rootView.technical_stacklist.getChildAdapterPosition(child)].name
-                                when(tech_id){
-                                    0 -> {
-                                        var stack01 = PushFragment()
-                                        _thisContext.replaceFramgment(R.id.content_frame, stack01)
-                                    }
-                                    1 -> {
-                                        container.context.toast(tech_name)
-                                    }
-                                    2 -> {
-                                        container.context.toast(tech_name)
-                                    }
-                                    3-> {
-                                        container.context.toast(tech_name)
-                                    }
-
-                                }
-                            }
-                        }
-
-                        return false
-                    }
-
-                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                    }
-
-                })*/
             }
 
             return rootView

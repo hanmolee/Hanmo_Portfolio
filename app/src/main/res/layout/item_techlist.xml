@@ -10,6 +10,7 @@
 
     <TextView
         android:id="@+id/tech_name_txt"
+        android:transitionName="techName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
@@ -17,6 +18,7 @@
         android:textSize="40dp"
         android:singleLine="true"
         android:ellipsize="end"
+        android:background="@drawable/bg_admin_et"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_list_minus"
         app:layout_constraintStart_toStartOf="parent"
