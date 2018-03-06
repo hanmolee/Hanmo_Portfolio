@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.portfolio.hanmo.hanmo.R
-import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.activity_detail_techstack.*
 
 /**
@@ -27,7 +26,7 @@ class DetailTechStackActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_techstack)
 
-        tech_name_txt.text = "dddd"
+        tech_name_txt.text = "기술 이름"
 
     }
 
