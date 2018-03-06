@@ -1,41 +1,40 @@
 package com.portfolio.hanmo.hanmo.Fragment
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.*
-import android.widget.TextView
+import android.view.animation.AlphaAnimation
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
-import com.portfolio.hanmo.hanmo.Activity.AddTechStackActivity
-import com.portfolio.hanmo.hanmo.Activity.AdminActivity
-import com.portfolio.hanmo.hanmo.Activity.DetailTechStackActivity
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.textChanges
+import com.portfolio.hanmo.hanmo.Activity.DetailTechActivity
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.Constants.RequestCodes
 import com.portfolio.hanmo.hanmo.Constants.ResultCodes
 import com.portfolio.hanmo.hanmo.Constants.Type
-import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
-import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
-import com.portfolio.hanmo.hanmo.MainActivity
-import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
-import kotlinx.android.synthetic.main.fragment_firstview.view.*
 import kotlinx.android.synthetic.main.fragment_pager.view.*
 import kotlinx.android.synthetic.main.fragment_stackpage.view.*
-import kotlinx.android.synthetic.main.item_techlist.view.*
-import kotlinx.android.synthetic.main.view_toolbar_main.*
-import kotlinx.android.synthetic.main.view_toolbar_main.view.*
-import org.jetbrains.anko.toast
 
 /**
  * Created by hanmo on 2018. 2. 3..
@@ -46,6 +45,23 @@ class Fragment_Pager : BaseFragment() {
     private var sparkleMotion: SparkleMotion? = null
     val TAG = "메인 페이지"
 
+    val onItemClickListener = object : TechListAdapter.OnItemClickListener {
+        override fun onItemClick(view: View, position: Int) {
+
+            val intent = DetailTechActivity.newIntent(activity, position)
+
+            val techImage = view.findViewById<ImageView>(R.id.TechImage)
+            val techNameHolder = view.findViewById<LinearLayout>(R.id.TechHolder)
+
+            val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
+            val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
+
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imagePair, holderPair)
+
+            ActivityCompat.startActivity(activity, intent, options.toBundle())
+        }
+
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var rootView = inflater!!.inflate(R.layout.fragment_pager, container, false)
@@ -55,21 +71,15 @@ class Fragment_Pager : BaseFragment() {
         setTitle("Welcome Page")
 
         with(sparkleViewPagerLayout!!.viewPager){
-            adapter = SparklePageAdapter(this@Fragment_Pager)
+            adapter = SparklePageAdapter(activity)
             setCurrentItem(1, true)
             setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
                 override fun onPageSelected(position: Int) {
                     when(position) {
-                        0 -> {
-                            setTitle("About Page")
-                            onBackButtonPressed(rootView)
-                        }
-                        1 -> { setTitle("Welcome Page") }
-                        2 -> {
-                            setTitle("Tech Stack Page")
-                            onBackButtonPressed(rootView)
-                        }
+                        0 -> {  }
+                        1 -> {  }
+                        2 -> {  }
                     }
                 }
                 override fun onPageScrollStateChanged(state: Int) {}
@@ -109,33 +119,19 @@ class Fragment_Pager : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun refreshFragment() {
+    private fun refreshFragment() {
         val ft = fragmentManager.beginTransaction()
         ft.detach(this).attach(this).commit()
     }
 
-    private class SparklePageAdapter(thisContext: Fragment_Pager) : ViewPagerAdapter() {
+    private class SparklePageAdapter(val activity: Activity) : ViewPagerAdapter() {
 
-        var _thisContext = thisContext
-
+        private lateinit var inputManager: InputMethodManager
+        var isSearchViewVisible: Boolean = false
         var type : Int = Type.list_is_null
-
-        private val onItemClickListener = object : TechListAdapter.OnItemClickListener {
-            @RequiresApi(Build.VERSION_CODES.M)
-            override fun onItemClick(view: View, position: Int) {
-
-                val intent = DetailTechStackActivity.newIntent(_thisContext.context, position)
-
-                val techNameHolder = view.findViewById<TextView>(R.id.tech_name_txt)
-
-                val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "techName")
-
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(_thisContext.activity, holderPair)
-
-                ActivityCompat.startActivity(_thisContext.context, intent, options.toBundle())
-            }
-
-        }
+        lateinit var btn_search : FloatingActionButton
+        lateinit var ly_search : LinearLayout
+        lateinit var et_search : EditText
 
         override fun getView(position: Int, container: ViewGroup): View? {
             when(position) {
@@ -153,7 +149,15 @@ class Fragment_Pager : BaseFragment() {
         }
 
         private fun stackViewPage(container: ViewGroup): View? {
+
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_stackpage, container, false)
+
+            btn_search = rootView.findViewById<FloatingActionButton>(R.id.btn_search)
+            ly_search = rootView.findViewById<LinearLayout>(R.id.ly_search)
+            et_search = rootView.findViewById(R.id.et_search)
+            rootView.ly_search.visibility = View.INVISIBLE
+
+            inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
             with(rootView.technical_stacklist) {
                 val tech_list = ArrayList<TechStack>()
@@ -161,12 +165,81 @@ class Fragment_Pager : BaseFragment() {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
                 val TechAdapter = TechListAdapter(tech_list, type)
-                TechAdapter.setOnItemClickListener(onItemClickListener)
+                TechAdapter.setOnItemClickListener(Fragment_Pager().onItemClickListener)
                 adapter = TechAdapter
-
             }
 
+            setSearchView()
+
+            //rootView.et_search.textChanges().doOnNext {  }.subscribe {  }
+
             return rootView
+        }
+
+        private fun setSearchView() {
+            btn_search.clicks()
+                    .doOnNext {
+                        when(isSearchViewVisible) {
+                            false -> {
+                                revealSearchView(ly_search)
+                                et_search.requestFocus()
+                                inputManager.showSoftInput(et_search, InputMethodManager.SHOW_IMPLICIT)
+
+                            }
+                            true -> {
+                                inputManager.hideSoftInputFromWindow(et_search.windowToken, 0)
+                                hideEditText(ly_search)
+
+                            }
+                        }
+                    }
+                    .subscribe {
+                        when(isSearchViewVisible) {
+                            false -> {
+                                isSearchViewVisible = true
+
+                                btn_search.setImageResource(R.drawable.ic_confirm)
+                                val alphaAnimation = AlphaAnimation(1.0f, 0.0f)
+                                alphaAnimation.duration = 100
+                                btn_search.startAnimation(alphaAnimation)
+
+                            }
+                            true -> {
+                                isSearchViewVisible = false
+
+                                btn_search.setImageResource(R.drawable.ic_search)
+                                val alphaAnimation = AlphaAnimation(1.0f, 0.0f)
+                                alphaAnimation.duration = 100
+                                btn_search.startAnimation(alphaAnimation)
+
+                            }
+                        }
+
+                    }
+        }
+
+        private fun hideEditText(ly_search: LinearLayout) {
+            val cx = ly_search.right - 30
+            val cy = ly_search.bottom - 60
+            val initialRadius = ly_search.width
+            val anim = ViewAnimationUtils.createCircularReveal(ly_search, cx, cy, initialRadius.toFloat(), 0f)
+            anim.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    ly_search.visibility = View.INVISIBLE
+                }
+            })
+            anim.start()
+        }
+
+        private fun revealSearchView(ly_search: LinearLayout) {
+            val cx = ly_search.right - 30
+            val cy = ly_search.bottom - 60
+            val finalRadius = Math.max(ly_search.width, ly_search.height)
+            val anim = ViewAnimationUtils.createCircularReveal(ly_search, cx, cy, 0F, finalRadius.toFloat())
+            anim.duration = 5000
+            ly_search.visibility = View.VISIBLE
+            anim.start()
         }
 
         private fun getData(tech_list: ArrayList<TechStack>) {
@@ -177,19 +250,9 @@ class Fragment_Pager : BaseFragment() {
                     Log.d("기술스택", "tech stack list is null!")
                 }
                 else -> {
-                    result.forEach { tech_list.add(TechStack(it.id, it.tech_name!!)) }
+                    type = Type.admin
+                    result.forEach { tech_list.add(TechStack(it.id, it.tech_name!!, it.tech_image!!)) }
 
-                    when(admin){
-                        1 -> {
-                            type = Type.admin
-                            tech_list.add(TechStack(-1,
-                                _thisContext.resources.getString(R.string.item_add)))
-                        }
-                        else -> {
-                            type = Type.not_admin
-                            Log.d(_thisContext.TAG, "관리자 아님")
-                        }
-                    }
                 }
             }
         }
@@ -200,33 +263,6 @@ class Fragment_Pager : BaseFragment() {
 
         private fun firstViewPage(container: ViewGroup): View? {
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_firstview, container, false)
-            when(admin) {
-                0 -> {
-                    rootView.count.text = "count : nullllllll "
-                }
-                1 -> {
-                    val run_count = RealmHelper.instance.testQuery(Admin_Table::class.java)
-                    when(run_count) {
-                        null -> {
-
-                        }
-                        else -> {
-                            run_count.count?.forEach {
-                                rootView.count.text = "count : " + it.count.toString()
-                            }
-                        }
-
-                    }
-                }
-            }
-
-
-            with(rootView.btn_admin_login){
-                setOnClickListener {
-                    val admin_intent = Intent(context, AdminActivity::class.java)
-                    _thisContext.startActivityForResult(admin_intent, RequestCodes.ADMIN)
-                }
-            }
 
             return rootView
         }

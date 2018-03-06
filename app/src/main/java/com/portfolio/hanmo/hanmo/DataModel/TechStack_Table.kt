@@ -18,7 +18,6 @@ open class TechStack_Table : RealmObject() {
 
     open var tech_name : String? = null
 
-    //@LinkingObjects("tech_list")
-    //val search_result : RealmResults<SearchResult_Table>? = null
+    open var tech_image : String? = null
 
 }

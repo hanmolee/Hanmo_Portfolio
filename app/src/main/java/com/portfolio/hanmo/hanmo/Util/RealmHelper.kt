@@ -3,13 +3,7 @@ package com.portfolio.hanmo.hanmo.Util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.portfolio.hanmo.hanmo.Activity.AdminActivity
-import com.portfolio.hanmo.hanmo.DataModel.Active_Count_Table
-import com.portfolio.hanmo.hanmo.DataModel.Admin_Table
-import com.portfolio.hanmo.hanmo.DataModel.SearchResult_Table
 import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
-import com.portfolio.hanmo.hanmo.MainActivity
-import com.portfolio.hanmo.hanmo.MainActivity.Companion.admin
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
 import org.jetbrains.anko.toast
@@ -29,7 +23,6 @@ class RealmHelper private constructor() {
 
     init {
         try {
-
             realm = Realm.getDefaultInstance()
 
         } catch (e: Exception) {
@@ -57,242 +50,27 @@ class RealmHelper private constructor() {
         editor.putBoolean(context.resources.getString(R.string.createRealm), true)
         editor.commit()
 
-        val count = queryFirst(Active_Count_Table::class.java)
         val tect_list = queryFirst(TechStack_Table::class.java)
 
-        when(count) {
-            null -> {
-                var count_table = Active_Count_Table()
-                count_table.id = 1
-                count_table.count = 1
-                val adminList = RealmList<Admin_Table>()
-                val admin_result = queryAll(Admin_Table::class.java)
-                when(admin_result.size) {
-                    0 -> {
-                        val admin = Admin_Table()
-                        adminList.add(admin)
-                    }
-                }
-                count_table.admin = adminList
-                realm!!.beginTransaction()
-                realm!!.copyToRealmOrUpdate(count_table)
-                realm!!.commitTransaction()
-            }
-        }
         when(tect_list) {
             null -> {
                 var tech = TechStack_Table()
-                val name = arrayOf("FCM PUSH", "AppWidget", "Encryption", "tech 04", "tech 05", "tech 06")
+                val name = arrayOf("Kotlin", "AppWidget", "Encryption", "Fabric", "Database", "Material Design", "Reactive X", "API")
+                val image = arrayOf("Kotlin", "AppWidget", "Encryption", "Fabric", "Database", "Material Design", "Reactive X", "API")
 
-                for (i in 0..5) {
+                for (i in 0 until name.size) {
                     tech.id = i
                     tech.tech_name = name[i]
+                    tech.tech_image = image[i]
                     addData(tech)
                 }
             }
         }
     }
 
-    fun <T : RealmObject> selectSearchResult(clazz: Class<T>): RealmResults<T> {
-        return realm!!.where(clazz).findAll().sort("search_time", Sort.DESCENDING).where().distinct("result")
+    fun <T : RealmObject> techStack_queryFirst(clazz: Class<T>, tech_id : Int): T?  {
+        return realm!!.where(clazz).equalTo("id", tech_id).findFirst()
     }
-
-    fun insertSearchResult(name: String) {
-        val currentIdNum = realm!!.where(SearchResult_Table::class.java!!).max("id")
-        val nextId: Int
-        nextId = when(currentIdNum){
-            null -> {
-                1
-            }
-            else -> {
-                currentIdNum!!.toInt() + 1
-            }
-        }
-        val result = SearchResult_Table()
-        result.id = nextId
-        result.result = name
-        result.search_time = System.currentTimeMillis()
-        /*var test = queryAll(TechStack_Table::class.java)
-        val list = RealmList<TechStack_Table>()
-        test.forEach {
-            val techlist = TechStack_Table()
-            techlist.id = it.id
-            techlist.tech_name = it.tech_name
-            list.add(techlist)
-        }
-        result.tech_list = list*/
-        val admin_result = queryAll(Admin_Table::class.java)
-        val adminList = RealmList<Admin_Table>()
-        when(admin_result.size) {
-            0 -> {
-                val admin = Admin_Table()
-                adminList.add(admin)
-            }
-            else -> {
-                admin_result.forEach {
-                    val admin = Admin_Table()
-                    admin.id = it.id
-                    admin.admin_id = it.admin_id
-                    admin.admin_password = it.admin_password
-                    adminList.add(admin)
-                }
-            }
-        }
-        result.admin = adminList
-
-        realm!!.beginTransaction()
-        realm!!.copyToRealmOrUpdate(result)
-        realm!!.commitTransaction()
-
-    }
-
-    fun updateSearchResult(result: String) {
-        val toEdit = realm!!.where(Admin_Table::class.java).equalTo("history.result", result).findAll()
-        when(toEdit.size){
-            0 -> {  }
-            else -> {
-                toEdit.forEach {
-                    realm!!.beginTransaction()
-                    it.history?.forEach {
-                        it.search_time = System.currentTimeMillis()
-                    }
-                    realm!!.commitTransaction()
-                }
-            }
-        }
-    }
-
-    fun updateActiveCount() {
-
-        val toEdit = queryFirst(Active_Count_Table::class.java)
-        var count = toEdit!!.count
-        realm!!.beginTransaction()
-        toEdit!!.count = count!! + 1
-        realm!!.commitTransaction()
-
-    }
-
-    fun adminLogin(context: AdminActivity, id: String, pwd: String) {
-        val toEdit = realm!!.where(Admin_Table::class.java).equalTo("admin_id", id).findFirst()
-        when(toEdit) {
-            null -> {
-                //아이디가 존재하지 않습니다
-                context.toast("아이디가 존재하지 않습니다.")
-            }
-            else -> {
-                when {
-                    toEdit!!.admin_password.equals(pwd) -> {
-                        //로그인 가능
-                        admin = 1
-                        context.setResult(100)
-                        context.finish()
-                    }
-                    else -> {
-                        //비밀번호가 틀렸습니다
-                        context.toast("비밀번호가 틀렸습니다")
-                    }
-                }
-            }
-        }
-    }
-
-    fun adminCreate(id: String, pwd: String) {
-        val currentIdNum = realm!!.where(Admin_Table::class.java!!).max("id")
-        val nextId: Int
-        nextId = when(currentIdNum){
-            null -> {
-                1
-            }
-            else -> {
-                currentIdNum!!.toInt() + 1
-            }
-        }
-
-        var admin = Admin_Table()
-        admin.id = nextId
-        admin.admin_id = id
-        admin.admin_password = pwd
-        /*val count = queryAll(Active_Count_Table::class.java)
-        val history = queryAll(SearchResult_Table::class.java)
-        val count_list = RealmList<Active_Count_Table>()
-        val history_list = RealmList<SearchResult_Table>()
-        when(count.size) {
-            0 -> {
-                Log.e("count", "count is null")
-            }
-            else -> {
-                count.forEach {
-                    val cnt = Active_Count_Table()
-                    cnt.id = it.id
-                    cnt.count = it.count
-                    count_list.add(cnt)
-                }
-            }
-        }
-        when(history.size) {
-            0 -> { Log.e("history", "history is null") }
-            else -> {
-                history.forEach {
-                    val hst = SearchResult_Table()
-                    hst.id = it.id
-                    hst.result = it.result
-                    hst.search_time = it.search_time
-                    Log.e("history value", "id : " + it.id + ", result : " + it.result)
-                    history_list.add(hst)
-                }
-            }
-        }
-
-        admin.history = history_list
-        admin.count = count_list
-        realm!!.beginTransaction()
-        realm!!.copyToRealmOrUpdate(admin)
-        realm!!.commitTransaction()*/
-        addData(admin)
-
-    }
-
-    fun <T : RealmObject> testQuery(clazz: Class<T>) : T?{
-        return realm!!.where(clazz).equalTo("admin_id", MainActivity.admin_id).findFirst()
-    }
-
-    fun deleteStackList(id: Int) {
-        val toEdit = realm!!.where(TechStack_Table::class.java).equalTo("id", id).findFirst()
-
-        realm!!.beginTransaction()
-        toEdit!!.deleteFromRealm()
-        realm!!.commitTransaction()
-
-    }
-
-    fun testDelete(name: String) {
-        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", name).findAll()
-
-        realm!!.beginTransaction()
-        toEdit!!.deleteAllFromRealm()
-        realm!!.commitTransaction()
-
-    }
-
-    fun testupdate(name: String) {
-        val toEdit = realm!!.where(SearchResult_Table::class.java).equalTo("result", name).findAll()
-
-        realm!!.beginTransaction()
-        toEdit.forEach {
-            it.result = "이름을 바꿔라"
-        }
-        realm!!.commitTransaction()
-
-    }
-
-    fun <T : RealmObject> queryResults(clazz: Class<T>, result: String): RealmResults<T> {
-        return realm!!.where(clazz).contains("tech_name", result).findAll()
-    }
-
-    fun <T : RealmObject>test(clazz: Class<T>) : RealmResults<T> {
-        return realm!!.where(clazz).equalTo("search_result.result", "tech 04").and().equalTo("tech_name", "tech 04").findAll()
-    }
-
 
     //Insert To Realm
     fun <T : RealmObject> addData(data: T) {

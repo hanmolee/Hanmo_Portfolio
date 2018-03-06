@@ -3,4 +3,4 @@ package com.portfolio.hanmo.hanmo.DataModel
 /**
  * Created by hanmo on 2018. 2. 4..
  */
-data class TechStack(val id : Int, val name : String)
+data class TechStack(val id : Int, val name : String, val image : String)

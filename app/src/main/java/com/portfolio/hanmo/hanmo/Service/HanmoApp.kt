@@ -20,7 +20,6 @@ class HanmoApp : Application() {
 
         val config = RealmConfiguration.Builder()
                 .name("hanmo.realm")
-                .schemaVersion(1)
                 .deleteRealmIfMigrationNeeded()
                 .build()
         Realm.setDefaultConfiguration(config)
