@@ -18,7 +18,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.ifttt.sparklemotion.SparkleMotion
 import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.jakewharton.rxbinding2.view.clicks
@@ -30,7 +29,7 @@ import com.portfolio.hanmo.hanmo.Constants.RequestCodes
 import com.portfolio.hanmo.hanmo.Constants.ResultCodes
 import com.portfolio.hanmo.hanmo.Constants.Type
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
-import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import kotlinx.android.synthetic.main.fragment_pager.view.*
@@ -44,24 +43,6 @@ class Fragment_Pager : BaseFragment() {
     private var sparkleViewPagerLayout: SparkleViewPagerLayout? = null
     private var sparkleMotion: SparkleMotion? = null
     val TAG = "메인 페이지"
-
-    val onItemClickListener = object : TechListAdapter.OnItemClickListener {
-        override fun onItemClick(view: View, position: Int) {
-
-            val intent = DetailTechActivity.newIntent(activity, position)
-
-            val techImage = view.findViewById<ImageView>(R.id.TechImage)
-            val techNameHolder = view.findViewById<LinearLayout>(R.id.TechHolder)
-
-            val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
-            val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
-
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imagePair, holderPair)
-
-            ActivityCompat.startActivity(activity, intent, options.toBundle())
-        }
-
-    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var rootView = inflater!!.inflate(R.layout.fragment_pager, container, false)
@@ -129,9 +110,25 @@ class Fragment_Pager : BaseFragment() {
         private lateinit var inputManager: InputMethodManager
         var isSearchViewVisible: Boolean = false
         var type : Int = Type.list_is_null
-        lateinit var btn_search : FloatingActionButton
-        lateinit var ly_search : LinearLayout
-        lateinit var et_search : EditText
+
+        val onItemClickListener = object : TechListAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+
+                val intent = DetailTechActivity.newIntent(activity, position)
+
+                val techImage = view.findViewById<ImageView>(R.id.TechImage)
+                val techNameHolder = view.findViewById<LinearLayout>(R.id.TechHolder)
+
+                val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
+                val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imagePair, holderPair)
+
+                ActivityCompat.startActivity(activity, intent, options.toBundle())
+            }
+
+        }
+
 
         override fun getView(position: Int, container: ViewGroup): View? {
             when(position) {
@@ -152,9 +149,6 @@ class Fragment_Pager : BaseFragment() {
 
             val rootView = LayoutInflater.from(container.context).inflate(R.layout.fragment_stackpage, container, false)
 
-            btn_search = rootView.findViewById<FloatingActionButton>(R.id.btn_search)
-            ly_search = rootView.findViewById<LinearLayout>(R.id.ly_search)
-            et_search = rootView.findViewById(R.id.et_search)
             rootView.ly_search.visibility = View.INVISIBLE
 
             inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -165,30 +159,50 @@ class Fragment_Pager : BaseFragment() {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
                 val TechAdapter = TechListAdapter(tech_list, type)
-                TechAdapter.setOnItemClickListener(Fragment_Pager().onItemClickListener)
+                TechAdapter.setOnItemClickListener(onItemClickListener)
                 adapter = TechAdapter
             }
 
-            setSearchView()
+            setSearchView(rootView)
+            selectTechList(rootView)
 
             //rootView.et_search.textChanges().doOnNext {  }.subscribe {  }
 
             return rootView
         }
 
-        private fun setSearchView() {
-            btn_search.clicks()
+        private fun selectTechList(rootView: View) {
+
+            rootView.et_search.textChanges()
+                    .doOnNext {
+                        //검색 화면 보이기
+                        when(it.length) {
+                            0 -> {
+                                //검색어를 입력해야한다
+                            }
+                            else -> {
+
+                            }
+                        }
+                    }
+                    .subscribe{
+
+                    }
+        }
+
+        private fun setSearchView(rootView: View) {
+            rootView.btn_search.clicks()
                     .doOnNext {
                         when(isSearchViewVisible) {
                             false -> {
-                                revealSearchView(ly_search)
-                                et_search.requestFocus()
-                                inputManager.showSoftInput(et_search, InputMethodManager.SHOW_IMPLICIT)
+                                revealSearchView(rootView.ly_search)
+                                rootView.et_search.requestFocus()
+                                inputManager.showSoftInput(rootView.et_search, InputMethodManager.SHOW_IMPLICIT)
 
                             }
                             true -> {
-                                inputManager.hideSoftInputFromWindow(et_search.windowToken, 0)
-                                hideEditText(ly_search)
+                                inputManager.hideSoftInputFromWindow(rootView.et_search.windowToken, 0)
+                                hideEditText(rootView.ly_search)
 
                             }
                         }
@@ -198,19 +212,19 @@ class Fragment_Pager : BaseFragment() {
                             false -> {
                                 isSearchViewVisible = true
 
-                                btn_search.setImageResource(R.drawable.ic_confirm)
+                                rootView.btn_search.setImageResource(R.drawable.ic_confirm)
                                 val alphaAnimation = AlphaAnimation(1.0f, 0.0f)
-                                alphaAnimation.duration = 100
-                                btn_search.startAnimation(alphaAnimation)
+                                alphaAnimation.duration = 200
+                                rootView.btn_search.startAnimation(alphaAnimation)
 
                             }
                             true -> {
                                 isSearchViewVisible = false
 
-                                btn_search.setImageResource(R.drawable.ic_search)
+                                rootView.btn_search.setImageResource(R.drawable.ic_search)
                                 val alphaAnimation = AlphaAnimation(1.0f, 0.0f)
-                                alphaAnimation.duration = 100
-                                btn_search.startAnimation(alphaAnimation)
+                                alphaAnimation.duration = 200
+                                rootView.btn_search.startAnimation(alphaAnimation)
 
                             }
                         }
@@ -243,7 +257,7 @@ class Fragment_Pager : BaseFragment() {
         }
 
         private fun getData(tech_list: ArrayList<TechStack>) {
-            var result = RealmHelper.instance.queryAll(TechStack_Table::class.java)
+            var result = RealmHelper.instance.queryAll(TechStackTable::class.java)
             when(result){
                 null -> {
                     type = Type.list_is_null

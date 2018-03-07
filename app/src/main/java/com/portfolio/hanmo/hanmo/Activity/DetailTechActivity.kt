@@ -8,7 +8,8 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.graphics.Palette
 import android.util.Log
-import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
+import com.portfolio.hanmo.hanmo.Fragment.Fragment_Pager
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
 import com.squareup.picasso.Picasso
@@ -19,12 +20,8 @@ import kotlinx.android.synthetic.main.activity_detail_techstack.*
  */
 class DetailTechActivity : Activity() {
 
-
-    private val tech_id : Int = intent.getIntExtra(EXTRA_PARAM_ID, 0)
-
-
     companion object {
-        val EXTRA_PARAM_ID = "tech_id"
+        const val EXTRA_PARAM_ID = "tech_id"
 
         fun newIntent(context: Context, position : Int) : Intent {
             val intent = Intent(context, DetailTechActivity::class.java)
@@ -37,7 +34,9 @@ class DetailTechActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_techstack)
 
-        val tech = RealmHelper.instance.techStack_queryFirst(TechStack_Table::class.java, tech_id)
+        val tech_id = intent.getIntExtra(EXTRA_PARAM_ID, 0)
+
+        val tech = RealmHelper.instance.techStack_queryFirst(TechStackTable::class.java, tech_id)
         when (tech) {
             null -> {
                 Log.e("Tech Detail", "Tech List is null")

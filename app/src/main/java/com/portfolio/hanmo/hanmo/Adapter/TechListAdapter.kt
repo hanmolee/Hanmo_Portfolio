@@ -21,9 +21,9 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
 
     lateinit var itemClickListener : OnItemClickListener
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when(viewType){
-            Type.admin -> return TechListHolder_admin(parent!!)
+            Type.admin -> return TechListHolder_admin(parent)
             //notlist -> {  }
         }
         throw IllegalArgumentException()
@@ -73,8 +73,8 @@ class TechListAdapter(val items : ArrayList<TechStack>, val type : Int) : Recycl
             }
         }
 
-        override fun onClick(v: View?) {
-            //itemClickListener.onItemClick(itemView, adapterPosition)
+            override fun onClick(v: View?) {
+            itemClickListener.onItemClick(itemView, adapterPosition)
         }
     }
 }

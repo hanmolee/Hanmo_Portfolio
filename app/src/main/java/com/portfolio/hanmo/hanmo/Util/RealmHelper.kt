@@ -3,12 +3,9 @@ package com.portfolio.hanmo.hanmo.Util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.portfolio.hanmo.hanmo.DataModel.TechStack_Table
+import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
-import org.jetbrains.anko.toast
-import io.realm.RealmList
-
 
 
 /**
@@ -50,11 +47,11 @@ class RealmHelper private constructor() {
         editor.putBoolean(context.resources.getString(R.string.createRealm), true)
         editor.commit()
 
-        val tect_list = queryFirst(TechStack_Table::class.java)
+        val tect_list = queryFirst(TechStackTable::class.java)
 
         when(tect_list) {
             null -> {
-                var tech = TechStack_Table()
+                var tech = TechStackTable()
                 val name = arrayOf("Kotlin", "AppWidget", "Encryption", "Fabric", "Database", "Material Design", "Reactive X", "API")
                 val image = arrayOf("Kotlin", "AppWidget", "Encryption", "Fabric", "Database", "Material Design", "Reactive X", "API")
 

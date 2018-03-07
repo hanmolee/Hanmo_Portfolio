@@ -7,31 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_search"
-        android:layout_width="@dimen/search_button_size"
-        android:layout_height="@dimen/search_button_size"
-        android:layout_gravity="end"
-        android:layout_marginEnd="20dp"
-        android:elevation="@dimen/button_elevation"
-        android:src="@drawable/ic_search"
-        app:backgroundTint="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toBottomOf="@+id/frame_layout"
-        app:layout_constraintEnd_toEndOf="@id/frame_layout"
-        app:layout_constraintTop_toTopOf="@+id/frame_layout"
-        app:layout_constraintHorizontal_bias="0.5"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/technical_stacklist"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frame_layout">
-
-    </android.support.v7.widget.RecyclerView>
-
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"
@@ -70,5 +45,30 @@
         </LinearLayout>
 
     </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_search"
+        android:layout_width="@dimen/search_button_size"
+        android:layout_height="@dimen/search_button_size"
+        android:layout_gravity="end"
+        android:layout_marginEnd="20dp"
+        android:elevation="@dimen/button_elevation"
+        android:src="@drawable/ic_search"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="@+id/frame_layout"
+        app:layout_constraintEnd_toEndOf="@id/frame_layout"
+        app:layout_constraintTop_toTopOf="@+id/frame_layout"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/technical_stacklist"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frame_layout">
+
+    </android.support.v7.widget.RecyclerView>
 
 </android.support.constraint.ConstraintLayout>

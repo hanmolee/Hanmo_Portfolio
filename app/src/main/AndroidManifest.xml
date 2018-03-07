@@ -26,17 +26,7 @@
         </activity>
 
         <activity
-            android:name=".Activity.AdminActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".Activity.AddTechStackActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".Activity.DetailTechStackActivity"
+            android:name=".Activity.DetailTechActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
