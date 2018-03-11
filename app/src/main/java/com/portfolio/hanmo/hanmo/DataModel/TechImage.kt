@@ -9,6 +9,7 @@ import com.portfolio.hanmo.hanmo.R
 object TechImage {
     fun techList() : ArrayList<Int> {
         val list = ArrayList<Int>()
+
         list.add(R.drawable.kotlin)
         list.add(R.drawable.fabric)
         list.add(R.drawable.encrypted)

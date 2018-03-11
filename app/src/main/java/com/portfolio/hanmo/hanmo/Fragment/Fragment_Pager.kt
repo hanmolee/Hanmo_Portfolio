@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.view.ViewPager
@@ -15,7 +14,6 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.ifttt.sparklemotion.SparkleMotion
@@ -28,6 +26,8 @@ import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.Constants.RequestCodes
 import com.portfolio.hanmo.hanmo.Constants.ResultCodes
 import com.portfolio.hanmo.hanmo.Constants.Type
+import com.portfolio.hanmo.hanmo.DataModel.SearchHistory
+import com.portfolio.hanmo.hanmo.DataModel.SearchHistoryTable
 import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.R
@@ -109,7 +109,7 @@ class Fragment_Pager : BaseFragment() {
 
         private lateinit var inputManager: InputMethodManager
         var isSearchViewVisible: Boolean = false
-        var type : Int = Type.list_is_null
+        var type : Int = Type.LISTISNULL
 
         val onItemClickListener = object : TechListAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
@@ -118,6 +118,24 @@ class Fragment_Pager : BaseFragment() {
 
                 val techImage = view.findViewById<ImageView>(R.id.TechImage)
                 val techNameHolder = view.findViewById<LinearLayout>(R.id.TechHolder)
+
+                val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
+                val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imagePair, holderPair)
+
+                ActivityCompat.startActivity(activity, intent, options.toBundle())
+            }
+
+        }
+
+        val onItemClickListener2 = object : TechListAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+
+                val intent = DetailTechActivity.newIntent(activity, position)
+
+                val techImage = view.findViewById<ImageView>(R.id.searchTechImage)
+                val techNameHolder = view.findViewById<LinearLayout>(R.id.searchTechNameHolder)
 
                 val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
                 val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
@@ -153,6 +171,17 @@ class Fragment_Pager : BaseFragment() {
 
             inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
+            initTechList(rootView)
+            setSearchView(rootView)
+            selectTechList(rootView)
+
+            //rootView.et_search.textChanges().doOnNext {  }.subscribe {  }
+
+            return rootView
+        }
+
+        private fun initTechList(rootView: View) {
+
             with(rootView.technical_stacklist) {
                 val tech_list = ArrayList<TechStack>()
                 getData(tech_list)
@@ -163,29 +192,55 @@ class Fragment_Pager : BaseFragment() {
                 adapter = TechAdapter
             }
 
-            setSearchView(rootView)
-            selectTechList(rootView)
-
-            //rootView.et_search.textChanges().doOnNext {  }.subscribe {  }
-
-            return rootView
         }
 
         private fun selectTechList(rootView: View) {
 
+            val searchHistory = ArrayList<SearchHistory>()
+
             rootView.et_search.textChanges()
                     .doOnNext {
                         //검색 화면 보이기
+
+                    }
+                    .subscribe{
                         when(it.length) {
                             0 -> {
-                                //검색어를 입력해야한다
+                                val searchResults = RealmHelper.instance.queryAll(SearchHistoryTable::class.java)
+                                when(searchResults) {
+                                    null -> {
+                                        searchHistory.add(SearchHistory(-1, "검색결과가 없습니다.", 0, null))
+                                    }
+                                }
+                                searchResults?.forEach {
+                                    searchHistory.add(SearchHistory(it.id, it.history_name, it.history_search_time, it.techstack_table))
+                                }
+                                searchHistory.add(SearchHistory(-2, "검색결과 모두 지우기", 0, null))
                             }
                             else -> {
+                                rootView.search_techlist_form.visibility = View.VISIBLE
+                                with(rootView.search_techlist){
+                                    val search_tech_list = ArrayList<TechStack>()
+                                    val searchTechResults = RealmHelper.instance.searchTechlist(TechStackTable::class.java, it.toString())
+                                    when(searchTechResults) {
+                                        null -> {
+
+                                        }
+                                    }
+                                    searchTechResults?.let {
+                                        it.forEach {
+                                            search_tech_list.add(TechStack(it.id, it.tech_name, it.tech_image))
+                                        }
+                                    }
+                                    setHasFixedSize(true)
+                                    layoutManager = LinearLayoutManager(context)
+                                    val TechAdapter = TechListAdapter(search_tech_list, Type.SEARCHTECHLIST)
+                                    TechAdapter.setOnItemClickListener(onItemClickListener2)
+                                    adapter = TechAdapter
+                                }
 
                             }
                         }
-                    }
-                    .subscribe{
 
                     }
         }
@@ -260,12 +315,12 @@ class Fragment_Pager : BaseFragment() {
             var result = RealmHelper.instance.queryAll(TechStackTable::class.java)
             when(result){
                 null -> {
-                    type = Type.list_is_null
+                    type = Type.LISTISNULL
                     Log.d("기술스택", "tech stack list is null!")
                 }
                 else -> {
-                    type = Type.admin
-                    result.forEach { tech_list.add(TechStack(it.id, it.tech_name!!, it.tech_image!!)) }
+                    type = Type.ADMIN
+                    result.forEach { tech_list.add(TechStack(it.id, it.tech_name, it.tech_image)) }
 
                 }
             }

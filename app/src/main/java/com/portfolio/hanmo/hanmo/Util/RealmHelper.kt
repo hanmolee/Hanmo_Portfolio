@@ -65,6 +65,10 @@ class RealmHelper private constructor() {
         }
     }
 
+    fun <T : RealmObject> searchTechlist(clazz: Class<T>, search_value : String) : RealmResults<T> {
+        return realm!!.where(clazz).contains("tech_name", search_value).findAll()
+    }
+
     fun <T : RealmObject> techStack_queryFirst(clazz: Class<T>, tech_id : Int): T?  {
         return realm!!.where(clazz).equalTo("id", tech_id).findFirst()
     }
