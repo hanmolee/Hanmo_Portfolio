@@ -7,4 +7,6 @@ object Type {
     val LISTISNULL = 0
     val ADMIN = 1
     val SEARCHTECHLIST = 2
+
+    val DELETEALL = -1
 }

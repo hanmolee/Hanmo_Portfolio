@@ -21,6 +21,7 @@ import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.portfolio.hanmo.hanmo.Activity.DetailTechActivity
+import com.portfolio.hanmo.hanmo.Adapter.SearchHistoryAdapter
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
 import com.portfolio.hanmo.hanmo.Adapter.ViewPagerAdapter
 import com.portfolio.hanmo.hanmo.Constants.RequestCodes
@@ -32,8 +33,10 @@ import com.portfolio.hanmo.hanmo.DataModel.TechStack
 import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.R
 import com.portfolio.hanmo.hanmo.Util.RealmHelper
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_pager.view.*
 import kotlinx.android.synthetic.main.fragment_stackpage.view.*
+import kotlinx.android.synthetic.main.item_search_techlist.view.*
 
 /**
  * Created by hanmo on 2018. 2. 3..
@@ -134,12 +137,12 @@ class Fragment_Pager : BaseFragment() {
 
                 val intent = DetailTechActivity.newIntent(activity, position)
 
+                RealmHelper.instance.insertSearchHistory(SearchHistoryTable::class.java, view.txt_search_techlist.text.toString())
+
                 val techImage = view.findViewById<ImageView>(R.id.searchTechImage)
                 val techNameHolder = view.findViewById<LinearLayout>(R.id.searchTechNameHolder)
-
                 val imagePair = android.support.v4.util.Pair.create(techImage as View, "tImage")
                 val holderPair = android.support.v4.util.Pair.create(techNameHolder as View, "tNameHolder")
-
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imagePair, holderPair)
 
                 ActivityCompat.startActivity(activity, intent, options.toBundle())
@@ -173,7 +176,6 @@ class Fragment_Pager : BaseFragment() {
 
             initTechList(rootView)
             setSearchView(rootView)
-            selectTechList(rootView)
 
             //rootView.et_search.textChanges().doOnNext {  }.subscribe {  }
 
@@ -196,8 +198,7 @@ class Fragment_Pager : BaseFragment() {
 
         private fun selectTechList(rootView: View) {
 
-            val searchHistory = ArrayList<SearchHistory>()
-
+            //구독해지해주어야 한다.
             rootView.et_search.textChanges()
                     .doOnNext {
                         //검색 화면 보이기
@@ -206,25 +207,37 @@ class Fragment_Pager : BaseFragment() {
                     .subscribe{
                         when(it.length) {
                             0 -> {
+                                rootView.search_techlist_form.visibility = View.INVISIBLE
+                                rootView.search_history_form.visibility = View.VISIBLE
+                                val searchHistory = ArrayList<SearchHistory>()
                                 val searchResults = RealmHelper.instance.queryAll(SearchHistoryTable::class.java)
                                 when(searchResults) {
                                     null -> {
-                                        searchHistory.add(SearchHistory(-1, "검색결과가 없습니다.", 0, null))
+                                        //searchHistory.add(SearchHistory(-1, "검색결과가 없습니다.", 0, null))
+                                    }
+                                    else -> {
+                                        searchResults?.forEach {
+                                            searchHistory.add(SearchHistory(it.id, it.history_name, it.history_search_time, it.techstack_table))
+                                        }
+                                        searchHistory.add(SearchHistory(Type.DELETEALL, "검색결과 모두 지우기", 0, null))
+
+                                        with(rootView.search_history) {
+                                            setHasFixedSize(true)
+                                            layoutManager = LinearLayoutManager(context)
+                                            adapter = SearchHistoryAdapter(searchHistory)
+                                        }
                                     }
                                 }
-                                searchResults?.forEach {
-                                    searchHistory.add(SearchHistory(it.id, it.history_name, it.history_search_time, it.techstack_table))
-                                }
-                                searchHistory.add(SearchHistory(-2, "검색결과 모두 지우기", 0, null))
                             }
                             else -> {
                                 rootView.search_techlist_form.visibility = View.VISIBLE
+                                rootView.search_history_form.visibility = View.INVISIBLE
                                 with(rootView.search_techlist){
                                     val search_tech_list = ArrayList<TechStack>()
                                     val searchTechResults = RealmHelper.instance.searchTechlist(TechStackTable::class.java, it.toString())
                                     when(searchTechResults) {
                                         null -> {
-
+                                            //결과없음
                                         }
                                     }
                                     searchTechResults?.let {
@@ -253,6 +266,8 @@ class Fragment_Pager : BaseFragment() {
                                 revealSearchView(rootView.ly_search)
                                 rootView.et_search.requestFocus()
                                 inputManager.showSoftInput(rootView.et_search, InputMethodManager.SHOW_IMPLICIT)
+
+                                selectTechList(rootView)
 
                             }
                             true -> {

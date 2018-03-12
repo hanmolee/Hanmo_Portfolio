@@ -3,6 +3,7 @@ package com.portfolio.hanmo.hanmo.Util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.portfolio.hanmo.hanmo.DataModel.SearchHistoryTable
 import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
@@ -71,6 +72,40 @@ class RealmHelper private constructor() {
 
     fun <T : RealmObject> techStack_queryFirst(clazz: Class<T>, tech_id : Int): T?  {
         return realm!!.where(clazz).equalTo("id", tech_id).findFirst()
+    }
+
+    fun <T : RealmObject> insertSearchHistory(clazz: Class<T>, techName : String) {
+
+        val currentIdNum = realm?.where(clazz)?.max("id")
+        val nextId: Int
+        nextId = when(currentIdNum){
+            null -> {
+                1
+            }
+            else -> {
+                currentIdNum.toInt() + 1
+            }
+        }
+
+        val history = SearchHistoryTable()
+        history.id = nextId
+        history.history_name = techName
+        history.history_search_time = System.currentTimeMillis()
+
+        val techStack = queryAll(TechStackTable::class.java)
+        val List = RealmList<TechStackTable>()
+        techStack?.forEach {
+            val tech = TechStackTable()
+            tech.id = it.id
+            tech.tech_name = it.tech_name
+            tech.tech_image = it.tech_image
+            List.add(tech)
+        }
+
+        realm?.beginTransaction()
+        realm?.copyToRealmOrUpdate(history)
+        realm?.commitTransaction()
+
     }
 
     //Insert To Realm
