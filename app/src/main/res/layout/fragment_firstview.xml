@@ -7,4 +7,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/btn_signup"
+        android:text="@string/signup"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:padding="10dp"
+        android:elevation="5dp"
+        android:transitionName="SignUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_signup"
+        android:layout_marginEnd="@dimen/margin_signup"
+        android:background="@drawable/bg_admin_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

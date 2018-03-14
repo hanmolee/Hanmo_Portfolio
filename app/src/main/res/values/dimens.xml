@@ -8,4 +8,6 @@
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="search_button_size">48dp</dimen>
     <dimen name="button_elevation">2dp</dimen>
+    <dimen name="margin_signup">10dp</dimen>
+    <dimen name="size_signup_check_icon">20dp</dimen>
 </resources>
