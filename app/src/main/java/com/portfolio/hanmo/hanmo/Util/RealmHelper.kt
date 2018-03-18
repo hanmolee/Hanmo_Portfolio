@@ -3,6 +3,7 @@ package com.portfolio.hanmo.hanmo.Util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.portfolio.hanmo.hanmo.Constants.UserInfo
 import com.portfolio.hanmo.hanmo.DataModel.SearchHistoryTable
 import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
 import com.portfolio.hanmo.hanmo.DataModel.UsersTable
@@ -85,6 +86,22 @@ class RealmHelper private constructor() {
         user.userId = user_id
         user.pwd = pwd
         user.createdAt = System.currentTimeMillis()
+        addData(user)
+
+    }
+
+    fun signIn(userId: String, pwd: String): Boolean {
+        val signIn = realm.where(UsersTable::class.java).equalTo("userId", userId).and().equalTo("pwd", pwd).findFirst()
+        return when(signIn) {
+            null -> {
+                false
+            }
+            else -> {
+                UserInfo.userId = signIn.id
+                UserInfo.userName = signIn.name
+                true
+            }
+        }
 
     }
 

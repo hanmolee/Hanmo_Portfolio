@@ -12,6 +12,7 @@
     <dimen name="size_signup_check_icon">20dp</dimen>
     <dimen name="margin_signin">20dp</dimen>
     <dimen name="margin_signin_et">10dp</dimen>
-    <dimen name="widtn_signin">55dp</dimen>
-    <item name="line_signin" type="dimen" format="float">1.2dp</item>
+    <dimen name="widtn_signin">70dp</dimen>
+    <dimen name="txt_size_signin">18dp</dimen>
+    <dimen name="line_signin">1.2dp</dimen>
 </resources>

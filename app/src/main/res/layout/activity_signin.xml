@@ -50,7 +50,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_signin"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/signup_id" />
+                    android:text="@string/signup_id"
+                    android:textSize="@dimen/txt_size_signin"/>
 
                 <TextView
                     android:layout_width="@dimen/line_signin"
@@ -62,11 +63,12 @@
 
                 <EditText
                     android:id="@+id/et_signin_id"
+                    android:textSize="@dimen/txt_size_signin"
+                    android:inputType="textEmailAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_signin_et"
                     android:background="@null"
-                    android:gravity="center_horizontal|center_vertical"
                     android:padding="@dimen/margin_signin_et" />
 
             </LinearLayout>
@@ -89,7 +91,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_signin"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/signup_pwd" />
+                    android:text="@string/signup_pwd"
+                    android:textSize="@dimen/txt_size_signin"/>
 
                 <TextView
                     android:layout_width="@dimen/line_signin"
@@ -101,11 +104,12 @@
 
                 <EditText
                     android:id="@+id/et_signin_pwd"
+                    android:inputType="textPassword"
+                    android:textSize="@dimen/txt_size_signin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_signin_et"
                     android:background="@null"
-                    android:gravity="center_horizontal|center_vertical"
                     android:padding="@dimen/margin_signin_et" />
 
             </LinearLayout>
@@ -113,12 +117,17 @@
 
             <Button
                 android:id="@+id/btn_signin"
+                android:transitionName="SignInButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginEnd="@dimen/margin_signup"
+                android:layout_marginStart="@dimen/margin_signup"
                 android:layout_marginTop="60dp"
                 android:text="@string/signin"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:textSize="@dimen/txt_size_signin"
+                android:background="@drawable/bg_btn_signin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -126,12 +135,17 @@
 
             <Button
                 android:id="@+id/btn_signup"
+                android:transitionName="SignUpButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/margin_signup"
+                android:layout_marginStart="@dimen/margin_signup"
+                android:layout_marginTop="@dimen/margin_signup"
                 android:text="@string/signup"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:textSize="@dimen/txt_size_signin"
+                android:background="@drawable/bg_btn_signin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btn_signin" />

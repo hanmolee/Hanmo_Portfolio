@@ -22,6 +22,7 @@ import com.ifttt.sparklemotion.SparkleViewPagerLayout
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.portfolio.hanmo.hanmo.Activity.DetailTechActivity
+import com.portfolio.hanmo.hanmo.Activity.SignInActivity
 import com.portfolio.hanmo.hanmo.Activity.SignUpActivity
 import com.portfolio.hanmo.hanmo.Adapter.SearchHistoryAdapter
 import com.portfolio.hanmo.hanmo.Adapter.TechListAdapter
@@ -385,6 +386,17 @@ class Fragment_Pager : BaseFragment() {
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, btnPair)
 
                 ActivityCompat.startActivity(activity, intentSignUp, options.toBundle())
+
+            }
+
+            rootView.btn_signin.setOnClickListener {
+                val intentSignIn = SignInActivity.newIntent(activity)
+
+                val btnPair = android.support.v4.util.Pair.create(it as View, "SignInButton")
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, btnPair)
+
+                ActivityCompat.startActivity(activity, intentSignIn, options.toBundle())
 
             }
 
