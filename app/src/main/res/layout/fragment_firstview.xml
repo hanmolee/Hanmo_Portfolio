@@ -23,4 +23,20 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/btn_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_signup"
+        android:layout_marginStart="@dimen/margin_signup"
+        android:background="@drawable/bg_admin_btn"
+        android:elevation="5dp"
+        android:padding="10dp"
+        android:text="@string/signin"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:transitionName="SignUpButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

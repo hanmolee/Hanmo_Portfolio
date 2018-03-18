@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/sign_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_signup"
+                android:layout_marginTop="40dp"
+                android:textSize="35dp"
+                android:text="로그인"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/layout_signin_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_signup"
+                android:layout_marginStart="@dimen/margin_signup"
+                android:layout_marginTop="112dp"
+                android:background="@drawable/bg_signin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sign_label">
+
+                <TextView
+                    android:layout_width="@dimen/widtn_signin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_signin"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/signup_id" />
+
+                <TextView
+                    android:layout_width="@dimen/line_signin"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/margin_signin_et"
+                    android:layout_marginLeft="@dimen/margin_signin_et"
+                    android:layout_marginTop="@dimen/margin_signin_et"
+                    android:background="@color/primary_dark" />
+
+                <EditText
+                    android:id="@+id/et_signin_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_signin_et"
+                    android:background="@null"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:padding="@dimen/margin_signin_et" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_signin_pwd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_signup"
+                android:layout_marginStart="@dimen/margin_signup"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_signin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout_signin_id">
+
+                <TextView
+                    android:layout_width="@dimen/widtn_signin"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_signin"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/signup_pwd" />
+
+                <TextView
+                    android:layout_width="@dimen/line_signin"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/margin_signin_et"
+                    android:layout_marginLeft="@dimen/margin_signin_et"
+                    android:layout_marginTop="@dimen/margin_signin_et"
+                    android:background="@color/primary_dark" />
+
+                <EditText
+                    android:id="@+id/et_signin_pwd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_signin_et"
+                    android:background="@null"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:padding="@dimen/margin_signin_et" />
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btn_signin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="60dp"
+                android:text="@string/signin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout_signin_pwd" />
+
+            <Button
+                android:id="@+id/btn_signup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/signup"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_signin" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

@@ -12,5 +12,6 @@
     <string name="signup_pwd">비밀번호</string>
     <string name="signup_confirm_pwd">비밀번호 확인</string>
     <string name="signup">회원가입</string>
+    <string name="signin">로그인</string>
 
 </resources>

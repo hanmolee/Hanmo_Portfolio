@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.portfolio.hanmo.hanmo.DataModel.SearchHistoryTable
 import com.portfolio.hanmo.hanmo.DataModel.TechStackTable
+import com.portfolio.hanmo.hanmo.DataModel.UsersTable
 import com.portfolio.hanmo.hanmo.R
 import io.realm.*
 
@@ -16,18 +17,18 @@ class RealmHelper private constructor() {
 
     val CREATE_REALM = "Create Realm"
 
-    var realm: Realm? = null
+    lateinit var realm: Realm
         private set
 
     init {
-        try {
-            realm = Realm.getDefaultInstance()
+        realm = try {
+            Realm.getDefaultInstance()
 
         } catch (e: Exception) {
             val config = RealmConfiguration.Builder()
                     .deleteRealmIfMigrationNeeded()
                     .build()
-            realm = Realm.getInstance(config)
+            Realm.getInstance(config)
         }
     }
 
@@ -65,18 +66,39 @@ class RealmHelper private constructor() {
             }
         }
     }
+    
+    fun <T : RealmObject> insertUsers(clazz: Class<T>, name: String, user_id: String, pwd: String) {
+        val currentIdNum = realm.where(clazz).max("id")
+        val nextId: Int
+        nextId = when(currentIdNum){
+            null -> {
+                1
+            }
+            else -> {
+                currentIdNum.toInt() + 1
+            }
+        }
+
+        val user = UsersTable()
+        user.id = nextId
+        user.name = name
+        user.userId = user_id
+        user.pwd = pwd
+        user.createdAt = System.currentTimeMillis()
+
+    }
 
     fun <T : RealmObject> searchTechlist(clazz: Class<T>, search_value : String) : RealmResults<T> {
-        return realm!!.where(clazz).contains("tech_name", search_value).findAll()
+        return realm.where(clazz).contains("tech_name", search_value).findAll()
     }
 
     fun <T : RealmObject> techStack_queryFirst(clazz: Class<T>, tech_id : Int): T?  {
-        return realm!!.where(clazz).equalTo("id", tech_id).findFirst()
+        return realm.where(clazz).equalTo("id", tech_id).findFirst()
     }
 
     fun <T : RealmObject> insertSearchHistory(clazz: Class<T>, techName : String) {
 
-        val currentIdNum = realm?.where(clazz)?.max("id")
+        val currentIdNum = realm.where(clazz).max("id")
         val nextId: Int
         nextId = when(currentIdNum){
             null -> {
@@ -94,7 +116,7 @@ class RealmHelper private constructor() {
 
         val techStack = queryAll(TechStackTable::class.java)
         val List = RealmList<TechStackTable>()
-        techStack?.forEach {
+        techStack.forEach {
             val tech = TechStackTable()
             tech.id = it.id
             tech.tech_name = it.tech_name
@@ -102,39 +124,39 @@ class RealmHelper private constructor() {
             List.add(tech)
         }
 
-        realm?.beginTransaction()
-        realm?.copyToRealmOrUpdate(history)
-        realm?.commitTransaction()
+        realm.beginTransaction()
+        realm.copyToRealmOrUpdate(history)
+        realm.commitTransaction()
 
     }
 
     //Insert To Realm
     fun <T : RealmObject> addData(data: T) {
 
-        realm!!.beginTransaction()
-        realm!!.copyToRealm(data)
-        realm!!.commitTransaction()
+        realm.beginTransaction()
+        realm.copyToRealm(data)
+        realm.commitTransaction()
     }
 
     fun <T : RealmObject> queryFirst(clazz: Class<T>): T? {
-        return realm!!.where(clazz).findFirst()
+        return realm.where(clazz).findFirst()
     }
 
 
     fun <T : RealmObject> queryAll(clazz: Class<T>): RealmResults<T> {
-        return realm!!.where(clazz).findAll()
+        return realm.where(clazz).findAll()
     }
 
 
     fun <T : RealmObject> delete(data: T) {
-        realm!!.beginTransaction()
+        realm.beginTransaction()
         data.deleteFromRealm()
-        realm!!.commitTransaction()
+        realm.commitTransaction()
     }
 
     fun <T : RealmObject> deleteAll(clazz: Class<T>) {
-        val results = realm!!.where(clazz).findAll()
-        realm!!.executeTransaction { results.deleteAllFromRealm() }
+        val results = realm.where(clazz).findAll()
+        realm.executeTransaction { results.deleteAllFromRealm() }
     }
 
 
